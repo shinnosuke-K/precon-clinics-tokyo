@@ -26,11 +26,20 @@
 
 ## 更新方法
 
-新しい一覧データが公開されたら、Excelファイルを `data/` に置いてスクリプトを実行します。
+新しい一覧データが公開されたら、Excelファイルを `data/` に追加してmainにpushするだけです。
+
+GitHub Actions（`.github/workflows/deploy.yml`）がpushを検知して次を自動で行います。
+
+1. `scripts/build.py` を実行し、`data/` 内で名前順最後のExcelから `index.html` を再生成
+   （`DATA` 配列と「令和N年N月N日時点」の日付3箇所が置き換わる。デザインやJS本体は不変）
+2. `index.html` に変更があればbotとしてコミット・push
+3. GitHub Pages へデプロイ
+
+Excelのファイル名は `20270331tourokuiryoukikan.xlsx` のように日付始まりにすると、名前順で自動的に最新版が選ばれます。
+
+手元で実行したい場合は次のとおりです。
 
 ```bash
 pip install openpyxl        # 初回のみ
-python3 scripts/build.py    # data/ 内で名前順最後のExcelを使用（引数でファイル指定も可）
+python3 scripts/build.py    # 引数でExcelファイルの指定も可
 ```
-
-`index.html` 内の `DATA` 配列と「令和N年N月N日時点」の日付（title・見出し・フッターの3箇所）が置き換わるので、Excelと合わせてコミット・pushすれば GitHub Pages に自動で再デプロイされます。ページのデザインやスクリプト本体は変更されません。
