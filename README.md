@@ -18,6 +18,7 @@
 | --- | --- |
 | `index.html` | 公開ページ本体。医療機関データはHTML内に埋め込み済みで、外部通信なしで動作します |
 | `data/20260831tourokuiryoukikan.xlsx` | 元データ（登録医療機関一覧、令和8年8月31日時点） |
+| `scripts/build.py` | 元データのExcelから `index.html` のデータ部分を再生成するスクリプト |
 
 ## データについて
 
@@ -25,4 +26,11 @@
 
 ## 更新方法
 
-新しい一覧データが公開されたら、`index.html` 内の `DATA` 配列（`<script>` タグ内）を新データで置き換え、元データのExcelファイルを `data/` に追加してコミットします。GitHub Pages はmainブランチへのpushで自動的に再デプロイされます。
+新しい一覧データが公開されたら、Excelファイルを `data/` に置いてスクリプトを実行します。
+
+```bash
+pip install openpyxl        # 初回のみ
+python3 scripts/build.py    # data/ 内で名前順最後のExcelを使用（引数でファイル指定も可）
+```
+
+`index.html` 内の `DATA` 配列と「令和N年N月N日時点」の日付（title・見出し・フッターの3箇所）が置き換わるので、Excelと合わせてコミット・pushすれば GitHub Pages に自動で再デプロイされます。ページのデザインやスクリプト本体は変更されません。
