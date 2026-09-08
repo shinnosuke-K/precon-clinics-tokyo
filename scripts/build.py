@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.14"
+# dependencies = ["openpyxl"]
+# ///
 """登録医療機関一覧のExcelからindex.htmlを更新するスクリプト。
 
 使い方:
-    python3 scripts/build.py [xlsxファイル] [htmlファイル]
+    uv run scripts/build.py [xlsxファイル] [htmlファイル]
 
 引数を省略すると data/ 内で名前順最後のExcelと、リポジトリ直下の index.html を使う。
 Excelの構成（1枚目: 登録医療機関リスト、2枚目以降: 医療機関ごとの詳細シート）を読み、
 index.html 内の `const DATA = [...];` の行と「令和N年N月N日時点」の日付3箇所を置き換える。
 ページのHTML・CSS・JS本体には手を加えない。
-
-依存: openpyxl (pip install openpyxl)
 """
 import datetime
 import json

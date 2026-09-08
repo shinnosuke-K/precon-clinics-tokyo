@@ -37,9 +37,8 @@ GitHub Actions（`.github/workflows/deploy.yml`）がpushを検知して次を�
 
 Excelのファイル名は `20270331tourokuiryoukikan.xlsx` のように日付始まりにすると、名前順で自動的に最新版が選ばれます。
 
-手元で実行したい場合は次のとおりです。
+手元で実行したい場合は [uv](https://docs.astral.sh/uv/) を使います。Python 3.14と依存パッケージ（openpyxl）はスクリプト内のメタデータからuvが自動で用意します。
 
 ```bash
-pip install openpyxl        # 初回のみ
-python3 scripts/build.py    # 引数でExcelファイルの指定も可
+uv run scripts/build.py    # 引数でExcelファイルの指定も可
 ```

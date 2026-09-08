@@ -23,15 +23,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.14"
-
-      - name: Install dependencies
-        run: pip install openpyxl
+      - uses: astral-sh/setup-uv@v6
 
       - name: Regenerate index.html from data/
-        run: python3 scripts/build.py
+        run: uv run scripts/build.py
 
       - name: Commit index.html if changed
         run: |
