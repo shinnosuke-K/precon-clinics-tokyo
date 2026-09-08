@@ -312,7 +312,7 @@ function detailHTML(r){
   const tel=r.tel?`<a href="tel:${esc(r.tel.replace(/[^0-9-]/g,""))}">${esc(r.tel)}</a>`:"—";
   return `${stop}
   <dl class="dl">
-    <dt>所在地</dt><dd>${esc(r.ad)}<br><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.nm+" "+r.ad)}" target="_blank" rel="noopener">${esc(r.nm)}</a>（Googleマップ）</dd>
+    <dt>所在地</dt><dd>${esc(r.ad)}　<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.nm+" "+r.ad)}" target="_blank" rel="noopener">Googleマップ</a></dd>
     <dt>電話</dt><dd>${tel}</dd>
     <dt>予約方法</dt><dd>${r.rv.length?esc(r.rv.join("／")):"—"}</dd>
     <dt>相談方法</dt><dd>${esc(r.cs.join("／"))}</dd>
