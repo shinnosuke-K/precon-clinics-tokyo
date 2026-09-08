@@ -92,7 +92,7 @@ main .wrap{padding:22px 20px 60px}
 ol.list{list-style:none;margin:0;padding:0;background:var(--sheet);border:1px solid var(--rule)}
 li.item{border-bottom:1px solid var(--rule)}
 li.item:last-child{border-bottom:0}
-.row-head{display:grid;grid-template-columns:4px 1fr auto;gap:0 14px;width:100%;
+.row-head{display:grid;grid-template-columns:4px 1fr auto;gap:0 14px;width:100%;text-decoration:none;
   background:none;border:0;padding:0;text-align:left;font:inherit;color:inherit;cursor:pointer}
 .row-head:hover .nm{color:var(--asagi-deep)}
 .bar{background:var(--both)}
@@ -107,13 +107,15 @@ li.item:last-child{border-bottom:0}
 .k-f .tag.kb{background:var(--female)} .k-m .tag.kb{background:var(--male)}
 .tag.sp{background:var(--asagi-pale);border-color:#c3e0e3;color:var(--asagi-deep)}
 .tag.stop{background:var(--warn-bg);border-color:#e9d5a6;color:var(--warn)}
-.chev{align-self:center;padding:0 14px;color:var(--mute);font-size:13px;white-space:nowrap}
-.chev svg{display:block;transition:transform .18s ease}
-li.open .chev svg{transform:rotate(180deg)}
+.chev{align-self:center;padding:0 14px;color:var(--mute);font-size:13px;white-space:nowrap;display:flex;align-items:center;gap:4px}
+.chev svg{display:block}
 
-/* detail */
-.detail{display:none;padding:4px 18px 26px 18px;background:#fbfcfb;border-top:1px dashed var(--rule)}
-li.open .detail{display:block}
+/* detail page */
+.backlink{display:inline-block;margin:0 0 14px;font-size:14px;color:var(--asagi-deep)}
+.dpage{background:var(--sheet);border:1px solid var(--rule);border-top:3px solid var(--both);padding:22px 24px 32px}
+.dpage.k-f{border-top-color:var(--female)}
+.dpage.k-m{border-top-color:var(--male)}
+.dnm{font-family:"Hiragino Mincho ProN","Yu Mincho","YuMincho","Noto Serif JP",serif;font-size:clamp(20px,3vw,27px);font-weight:600;line-height:1.4;margin:0 0 4px;overflow-wrap:anywhere}
 .stopnote{margin:14px 0 0;padding:10px 12px;background:var(--warn-bg);border-left:3px solid #d9a93a;font-size:13.5px;color:var(--warn)}
 .dl{display:grid;grid-template-columns:6.5em 1fr;gap:4px 14px;margin:16px 0 0;font-size:14.5px}
 .dl dt{color:var(--mute);font-size:13.5px;padding-top:2px}
@@ -146,7 +148,7 @@ footer li{margin-bottom:4px}
   .chev span{display:none}
   .dl{grid-template-columns:1fr;gap:0 0}
   .dl dt{padding-top:8px}
-  .detail{padding-left:12px;padding-right:12px}
+  .dpage{padding-left:14px;padding-right:14px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 @media print{
@@ -211,6 +213,15 @@ footer li{margin-bottom:4px}
   <div class="wrap">
     <ol class="list" id="list"></ol>
     <div class="empty" id="empty" hidden><b>該当する医療機関がありません</b>条件をゆるめるか、検索語を変えてお試しください。</div>
+    <section id="detailview" hidden>
+      <a class="backlink" href="#" id="backlink">← 一覧に戻る</a>
+      <article class="dpage" id="dpage">
+        <h2 class="dnm" id="dnm"></h2>
+        <p class="meta" id="dmeta"></p>
+        <div class="tags" id="dtags"></div>
+        <div id="dbody"></div>
+      </article>
+    </section>
   </div>
 </main>
 
@@ -319,7 +330,7 @@ function detailHTML(r){
   <p class="asof">料金・検査内容は${esc(r.as)}時点の届出内容／登録日 ${esc(r.dt.replace(/-/g,"."))}</p>`;
 }
 
-function rowHTML(r,i){
+function tagsHTML(r){
   const tags=[`<span class="tag kb">${KBLABEL[r.kb]}</span>`];
   if(r.note) tags.push(`<span class="tag stop">受付停止中</span>`);
   if(r.sp) tags.push(`<span class="tag sp">女性ヘルスケア専門医</span>`);
@@ -327,19 +338,22 @@ function rowHTML(r,i){
   if(r.rv.some(x=>x.startsWith("web"))) tags.push(`<span class="tag">web予約</span>`);
   const [ft,fc]=yen(r.fee[0]);
   tags.push(`<span class="tag">初診 ${esc(fc==="na"&&ft.length>9?"詳細を参照":ft)}</span>`);
+  return tags.join("");
+}
+
+function rowHTML(r,i){
   return `<li class="item k-${r.kb}" data-n="${r.n}">
-    <button class="row-head" aria-expanded="false" aria-controls="d${r.n}">
+    <a class="row-head" href="#c/${r.n}">
       <span class="bar"></span>
       <span class="body">
         <span class="nm">${esc(r.nm)}</span>
         <span class="meta"><span class="city">${esc(r.ct)}</span>${esc(r.ad.replace(/^東京都/,""))}</span>
-        <span class="tags">${tags.join("")}</span>
+        <span class="tags">${tagsHTML(r)}</span>
       </span>
       <span class="chev"><span>詳細</span>
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3.5 6L8 10.5 12.5 6"/></svg>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3.5L10.5 8 6 12.5"/></svg>
       </span>
-    </button>
-    <div class="detail" id="d${r.n}"></div>
+    </a>
   </li>`;
 }
 
@@ -356,16 +370,42 @@ function render(){
   areaSel.value=S.ward;
 }
 
+/* ---- routing (list <-> detail page) ---- */
+const baseTitle=document.title;
+let listScroll=0;
+function showDetail(r){
+  el("dpage").className="dpage k-"+r.kb;
+  el("dnm").textContent=r.nm;
+  el("dmeta").innerHTML=`<span class="city">${esc(r.ct)}</span>${esc(r.ad.replace(/^東京都/,""))}`;
+  el("dtags").innerHTML=tagsHTML(r);
+  el("dbody").innerHTML=detailHTML(r);
+  document.querySelector("section.areas").hidden=true;
+  document.querySelector(".filters").hidden=true;
+  el("list").hidden=true; el("empty").hidden=true;
+  el("detailview").hidden=false;
+  document.title=r.nm+"｜"+baseTitle;
+  window.scrollTo(0,0);
+}
+function showList(){
+  el("detailview").hidden=true;
+  document.querySelector("section.areas").hidden=false;
+  document.querySelector(".filters").hidden=false;
+  document.title=baseTitle;
+  render();
+  window.scrollTo(0,listScroll);
+}
+function route(){
+  const m=location.hash.match(/^#c\/(\d+)$/);
+  const r=m&&DATA.find(x=>x.n===+m[1]);
+  if(r) showDetail(r); else showList();
+}
+window.addEventListener("hashchange",route);
+
 /* ---- events ---- */
 el("list").addEventListener("click",e=>{
-  const btn=e.target.closest(".row-head"); if(!btn) return;
-  const li=btn.closest("li.item"); const box=li.querySelector(".detail");
-  const open=li.classList.toggle("open");
-  btn.setAttribute("aria-expanded",String(open));
-  if(open && !box.dataset.filled){
-    box.innerHTML=detailHTML(DATA.find(r=>r.n===+li.dataset.n)); box.dataset.filled="1";
-  }
+  if(e.target.closest(".row-head")) listScroll=window.scrollY;
 });
+el("backlink").addEventListener("click",e=>{e.preventDefault();location.hash="";});
 document.getElementById("wards").addEventListener("click",e=>{
   const b=e.target.closest(".ward"); if(!b) return;
   S.ward = S.ward===b.dataset.ward ? "" : b.dataset.ward; render();
@@ -382,6 +422,7 @@ el("reset").addEventListener("click",()=>{
   render(); window.scrollTo({top:0,behavior:"smooth"});
 });
 render();
+route();
 </script>
 </body>
 </html>
