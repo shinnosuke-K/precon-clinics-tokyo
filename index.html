@@ -62,6 +62,7 @@ section.areas{background:var(--sheet);border-bottom:1px solid var(--rule)}
 .sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0 0 12px}
 .sec-h h2{font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;font-size:17px;font-weight:600;margin:0}
 .sec-h .hint{font-size:13px;color:var(--mute)}
+.wtoggle{display:none}
 .wardgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px 26px}
 .ward{display:grid;grid-template-columns:5.2em 1fr 2.2em;align-items:center;gap:8px;
   background:none;border:0;padding:3px 4px;cursor:pointer;text-align:left;font:inherit;color:inherit;border-radius:3px}
@@ -148,7 +149,22 @@ footer li{margin-bottom:4px}
 }
 @media (max-width:560px){
   :root{--fs:15px}
-  .wardgrid{grid-template-columns:1fr}
+  .areas .sec-h .hint{display:none}
+  .areas .sec-h{margin-bottom:10px}
+  .wardgrid{display:flex;flex-wrap:wrap;gap:7px}
+  .ward{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;
+    background:var(--sheet);border:1px solid var(--rule);border-radius:999px}
+  .ward .wb{display:none}
+  .ward .wn{font-size:13px}
+  .ward .wc{font-size:12px}
+  .ward[aria-pressed="true"]{background:var(--asagi);border-color:var(--asagi)}
+  .ward[aria-pressed="true"] .wn{color:#fff;font-weight:600}
+  .ward[aria-pressed="true"] .wc{color:#d6eaec}
+  .wardgrid:not(.expanded) .ward.more{display:none}
+  .wardgrid:not(.expanded) .ward.more[aria-pressed="true"]{display:inline-flex}
+  .wtoggle{display:inline-flex;align-items:center;font:inherit;font-size:13px;padding:6px 12px;
+    background:none;border:1px dashed var(--rule);border-radius:999px;color:var(--asagi-deep);cursor:pointer}
+  .wardgrid.expanded .wtoggle{display:none}
   .chev span{display:none}
   .dl{grid-template-columns:1fr;gap:0 0}
   .dl dt{padding-top:8px}
@@ -264,8 +280,9 @@ document.getElementById("f-sp").textContent=DATA.filter(r=>r.sp).length;
 /* ---- ward chart + select ---- */
 const wardsSorted=Object.entries(wardCount).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],"ja"));
 const max=wardsSorted[0][1];
-document.getElementById("wards").innerHTML=wardsSorted.map(([w,c])=>
-  `<button class="ward" data-ward="${esc(w)}" aria-pressed="false"><span class="wn">${esc(w)}</span><span class="wb"><i style="width:${(c/max*100).toFixed(1)}%"></i></span><span class="wc">${c}</span></button>`).join("");
+document.getElementById("wards").innerHTML=wardsSorted.map(([w,c],i)=>
+  `<button class="ward${i>=8?" more":""}" data-ward="${esc(w)}" aria-pressed="false"><span class="wn">${esc(w)}</span><span class="wb"><i style="width:${(c/max*100).toFixed(1)}%"></i></span><span class="wc">${c}</span></button>`).join("")
+  +`<button class="wtoggle">すべて表示（全${wardsSorted.length}エリア）</button>`;
 const areaSel=document.getElementById("area");
 const ku=wardsSorted.filter(([w])=>w.endsWith("区")).map(([w,c])=>[w,c]).sort((a,b)=>a[0].localeCompare(b[0],"ja"));
 const shi=wardsSorted.filter(([w])=>!w.endsWith("区")).sort((a,b)=>a[0].localeCompare(b[0],"ja"));
@@ -411,6 +428,7 @@ el("list").addEventListener("click",e=>{
 });
 el("backlink").addEventListener("click",e=>{e.preventDefault();location.hash="";});
 document.getElementById("wards").addEventListener("click",e=>{
+  if(e.target.closest(".wtoggle")){document.getElementById("wards").classList.add("expanded");return;}
   const b=e.target.closest(".ward"); if(!b) return;
   S.ward = S.ward===b.dataset.ward ? "" : b.dataset.ward; render();
 });
