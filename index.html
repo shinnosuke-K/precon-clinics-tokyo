@@ -82,7 +82,9 @@ input[type=search],select{
   font:inherit;font-size:14px;color:var(--ink);background:var(--sheet);
   border:1px solid var(--rule);border-radius:2px;padding:8px 10px;min-height:40px}
 input[type=search]{flex:1 1 240px;min-width:180px}
-input[type=search]:focus,select:focus,.chip:focus-visible,.ward:focus-visible,.row-head:focus-visible{outline:2px solid var(--asagi);outline-offset:1px}
+input[type=search]:focus,select:focus,.chip:focus-visible,.ward:focus-visible,.row-head:focus-visible,.ftoggle:focus-visible{outline:2px solid var(--asagi);outline-offset:1px}
+.ftoggle{display:none}
+.fmore{display:contents}
 .chip{font:inherit;font-size:13.5px;padding:7px 12px;min-height:40px;background:var(--sheet);
   border:1px solid var(--rule);border-radius:999px;cursor:pointer;color:var(--ink-2)}
 .chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
@@ -166,6 +168,14 @@ footer li{margin-bottom:4px}
     background:none;border:1px dashed var(--rule);border-radius:999px;color:var(--asagi-deep);cursor:pointer}
   .wardgrid.expanded .wtoggle{display:none}
   .chev span{display:none}
+  .frow input[type=search]{flex:1 1 auto;min-width:0}
+  .ftoggle{display:inline-flex;align-items:center;font:inherit;font-size:13.5px;min-height:40px;padding:7px 12px;
+    background:var(--sheet);border:1px solid var(--rule);border-radius:2px;color:var(--ink-2);cursor:pointer;white-space:nowrap}
+  .ftoggle span{color:var(--asagi-deep);font-weight:700}
+  .filters.open .ftoggle{background:var(--ink);border-color:var(--ink);color:#fff}
+  .filters.open .ftoggle span{color:#fff}
+  .fmore{display:none}
+  .filters.open .fmore{display:flex;flex-wrap:wrap;gap:8px;flex-basis:100%}
   .dl{grid-template-columns:1fr;gap:0 0}
   .dl dt{padding-top:8px}
   .dpage{padding-left:14px;padding-right:14px}
@@ -208,19 +218,22 @@ footer li{margin-bottom:4px}
 <div class="filters">
   <div class="wrap">
     <div class="frow">
-      <input type="search" id="q" placeholder="医療機関名・住所で検索（例：新宿、ART）" aria-label="医療機関名・住所で検索">
-      <select id="area" aria-label="区市町村で絞り込み"><option value="">すべての区市町村</option></select>
-      <button class="chip k-f" id="c-f" aria-pressed="false">女性が受診できる</button>
-      <button class="chip k-m" id="c-m" aria-pressed="false">男性が受診できる</button>
-      <button class="chip" id="c-online" aria-pressed="false">オンライン相談可</button>
-      <button class="chip" id="c-web" aria-pressed="false">web予約可</button>
-      <button class="chip" id="c-sp" aria-pressed="false">女性ヘルスケア専門医</button>
-      <select id="sort" aria-label="並び順">
-        <option value="no">登録順</option>
-        <option value="fee">初診料が安い順</option>
-        <option value="name">五十音・アルファベット順</option>
-        <option value="new">登録が新しい順</option>
-      </select>
+      <input type="search" id="q" placeholder="医療機関名・住所・電話で検索（例：新宿、ART）" aria-label="医療機関名・住所・電話番号で検索">
+      <button class="ftoggle" id="ftoggle" aria-expanded="false" aria-controls="fmore">絞り込み<span id="fcount"></span></button>
+      <div class="fmore" id="fmore">
+        <select id="area" aria-label="区市町村で絞り込み"><option value="">すべての区市町村</option></select>
+        <button class="chip k-f" id="c-f" aria-pressed="false">女性が受診できる</button>
+        <button class="chip k-m" id="c-m" aria-pressed="false">男性が受診できる</button>
+        <button class="chip" id="c-online" aria-pressed="false">オンライン相談可</button>
+        <button class="chip" id="c-web" aria-pressed="false">web予約可</button>
+        <button class="chip" id="c-sp" aria-pressed="false">女性ヘルスケア専門医</button>
+        <select id="sort" aria-label="並び順">
+          <option value="no">登録順</option>
+          <option value="fee">初診料が安い順</option>
+          <option value="name">五十音・アルファベット順</option>
+          <option value="new">登録が新しい順</option>
+        </select>
+      </div>
     </div>
     <div class="status">
       <span><b id="count">0</b> 件を表示中<span id="filterdesc"></span></span>
@@ -268,6 +281,9 @@ const yen=v=>{
 };
 const feeNum=r=>{const s=String(r.fee[0]||"").replace(/[,，]/g,"");const m=s.match(/\d+/);return m?+m[0]:Infinity;};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+/* 全角→半角・大文字→小文字・カタカナ→ひらがなに揃えて表記ゆれを吸収する */
+const norm=s=>String(s).normalize("NFKC").toLowerCase().replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60));
+DATA.forEach(r=>r._s=norm(r.nm+" "+r.ad+" "+r.ct+" "+r.tel+" "+r.tel.replace(/-/g,"")));
 
 /* ---- facts ---- */
 const wardCount={};
@@ -290,7 +306,7 @@ const grp=(label,arr)=>`<optgroup label="${label}">`+arr.map(([w,c])=>`<option v
 areaSel.insertAdjacentHTML("beforeend",grp("特別区",ku)+grp("市部",shi));
 
 /* ---- state ---- */
-const S={q:"",ward:"",f:false,m:false,online:false,web:false,sp:false,sort:"no"};
+const S={q:"",qn:"",ward:"",f:false,m:false,online:false,web:false,sp:false,sort:"no"};
 const el=id=>document.getElementById(id);
 
 function match(r){
@@ -300,8 +316,7 @@ function match(r){
   if(S.online && !r.cs.includes("オンライン")) return false;
   if(S.web && !r.rv.some(x=>x.startsWith("web"))) return false;
   if(S.sp && !r.sp) return false;
-  if(S.q){const q=S.q.toLowerCase();
-    if(!((r.nm+" "+r.ad+" "+r.ct).toLowerCase().includes(q))) return false;}
+  if(S.qn && !r._s.includes(S.qn)) return false;
   return true;
 }
 function sortRows(rows){
@@ -384,6 +399,8 @@ function render(){
   const on=[S.ward&&S.ward, S.f&&"女性可", S.m&&"男性可", S.online&&"オンライン相談", S.web&&"web予約", S.sp&&"専門医在籍", S.q&&`「${S.q}」`].filter(Boolean);
   el("filterdesc").textContent=on.length?"（"+on.join("・")+"）":"";
   el("reset").hidden=!on.length;
+  const nf=[S.ward,S.f,S.m,S.online,S.web,S.sp].filter(Boolean).length;
+  el("fcount").textContent=nf?`（${nf}）`:"";
   el("list").innerHTML=rows.map(rowHTML).join("");
   el("empty").hidden=rows.length>0;
   el("list").hidden=rows.length===0;
@@ -434,12 +451,16 @@ document.getElementById("wards").addEventListener("click",e=>{
 });
 areaSel.addEventListener("change",()=>{S.ward=areaSel.value;render();});
 el("sort").addEventListener("change",()=>{S.sort=el("sort").value;render();});
-let t; el("q").addEventListener("input",()=>{clearTimeout(t);t=setTimeout(()=>{S.q=el("q").value.trim();render();},160);});
+let t; el("q").addEventListener("input",()=>{clearTimeout(t);t=setTimeout(()=>{S.q=el("q").value.trim();S.qn=norm(S.q);render();},160);});
+el("ftoggle").addEventListener("click",()=>{
+  const open=document.querySelector(".filters").classList.toggle("open");
+  el("ftoggle").setAttribute("aria-expanded",String(open));
+});
 [["c-f","f"],["c-m","m"],["c-online","online"],["c-web","web"],["c-sp","sp"]].forEach(([id,key])=>{
   el(id).addEventListener("click",()=>{S[key]=!S[key];el(id).setAttribute("aria-pressed",String(S[key]));render();});
 });
 el("reset").addEventListener("click",()=>{
-  Object.assign(S,{q:"",ward:"",f:false,m:false,online:false,web:false,sp:false});
+  Object.assign(S,{q:"",qn:"",ward:"",f:false,m:false,online:false,web:false,sp:false});
   el("q").value=""; ["c-f","c-m","c-online","c-web","c-sp"].forEach(i=>el(i).setAttribute("aria-pressed","false"));
   render(); window.scrollTo({top:0,behavior:"smooth"});
 });
