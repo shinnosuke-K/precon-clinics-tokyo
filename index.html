@@ -7,8 +7,7 @@
 <link rel="icon" href="asset/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="asset/favicon.ico" sizes="32x32">
 <link rel="apple-touch-icon" href="asset/apple-touch-icon.png">
-<meta name="theme-color" media="(prefers-color-scheme: light)" content="#0f7c8a">
-<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#10191d">
+<meta name="theme-color" content="#0f7c8a">
 <meta name="description" content="東京都のプレコンセプションケア検査費等助成に登録している医療機関の一覧（令和8年8月31日時点）。エリア・受診対象・予約方法から検索できます。個人が作成した非公式サイトであり、東京都が運営するものではありません。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="プレコンセプションケア 検査費等助成 登録医療機関リスト（非公式）">
@@ -23,6 +22,16 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image:alt" content="東京都 プレコンセプションケア 検査費等助成 登録医療機関リスト（個人作成の非公式サイト）">
 <link rel="canonical" href="https://shinnosuke-k.github.io/precon-clinics-tokyo/">
+<script>
+/* 描画前にテーマを決めてちらつきを防ぐ。保存された選択がなければOS設定に追従 */
+(function(){
+  var t=null; try{t=localStorage.getItem("theme")}catch(e){}
+  var d=(t==="dark"||t==="light")?t:(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");
+  document.documentElement.dataset.theme=d;
+  var m=document.querySelector('meta[name="theme-color"]');
+  if(m&&d==="dark")m.content="#10191d";
+})();
+</script>
 <style>
 :root{
   --ink:#142229; --ink-2:#3d4f57; --mute:#6d7f86;
@@ -37,19 +46,17 @@
   --alert:#b3372a;
   --fs:16px;
 }
-@media (prefers-color-scheme:dark){
-  :root{
-    --ink:#e3ecee; --ink-2:#b7c6cb; --mute:#8ba0a7;
-    --paper:#10191d; --sheet:#182529; --rule:#2c3b40;
-    --asagi:#3fa9b6; --asagi-pale:#1b3338; --asagi-deep:#82ccd6;
-    --both:#5d8f36; --female:#b05a80; --male:#5577b8;
-    --warn:#d9b36a; --warn-bg:#2d2514;
-    --sel:#dce8ea; --sel-fg:#121c20;
-    --glass:rgba(16,25,29,.92);
-    --sp-border:#2b4a50;
-    --stop-border:#574a27; --stopnote-border:#8a7336;
-    --alert:#e0766a;
-  }
+:root[data-theme="dark"]{
+  --ink:#e3ecee; --ink-2:#b7c6cb; --mute:#8ba0a7;
+  --paper:#10191d; --sheet:#182529; --rule:#2c3b40;
+  --asagi:#3fa9b6; --asagi-pale:#1b3338; --asagi-deep:#82ccd6;
+  --both:#5d8f36; --female:#b05a80; --male:#5577b8;
+  --warn:#d9b36a; --warn-bg:#2d2514;
+  --sel:#dce8ea; --sel-fg:#121c20;
+  --glass:rgba(16,25,29,.92);
+  --sp-border:#2b4a50;
+  --stop-border:#574a27; --stopnote-border:#8a7336;
+  --alert:#e0766a;
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
@@ -63,8 +70,12 @@ a{color:var(--asagi-deep)}
 
 /* masthead */
 header.mast{background:var(--sheet);border-bottom:1px solid var(--rule)}
-.mast .wrap{padding-top:28px;padding-bottom:22px}
-.kicker{font-size:13px;color:var(--mute);letter-spacing:.04em;margin:0 0 6px}
+.mast .wrap{position:relative;padding-top:28px;padding-bottom:22px}
+.kicker{font-size:13px;color:var(--mute);letter-spacing:.04em;margin:0 0 6px;padding-right:48px}
+.themebtn{position:absolute;top:24px;right:20px;width:38px;height:38px;border-radius:50%;padding:0;
+  display:flex;align-items:center;justify-content:center;font-size:17px;line-height:1;
+  background:var(--sheet);border:1px solid var(--rule);color:var(--ink-2);cursor:pointer}
+.themebtn:hover{background:var(--asagi-pale)}
 h1{
   font-family:"Hiragino Mincho ProN","Yu Mincho","YuMincho","Noto Serif JP",serif;
   font-size:clamp(23px,3.6vw,33px); line-height:1.35; font-weight:600; margin:0 0 10px;
@@ -102,7 +113,7 @@ input[type=search],select{
   font:inherit;font-size:14px;color:var(--ink);background:var(--sheet);
   border:1px solid var(--rule);border-radius:2px;padding:8px 10px;min-height:40px}
 input[type=search]{flex:1 1 240px;min-width:180px}
-input[type=search]:focus,select:focus,.chip:focus-visible,.ward:focus-visible,.row-head:focus-visible,.ftoggle:focus-visible{outline:2px solid var(--asagi);outline-offset:1px}
+input[type=search]:focus,select:focus,.chip:focus-visible,.ward:focus-visible,.row-head:focus-visible,.ftoggle:focus-visible,.themebtn:focus-visible{outline:2px solid var(--asagi);outline-offset:1px}
 .ftoggle{display:none}
 .fmore{display:contents}
 .chip{font:inherit;font-size:13.5px;padding:7px 12px;min-height:40px;background:var(--sheet);
@@ -203,7 +214,13 @@ footer li{margin-bottom:4px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 @media print{
-  .filters,.areas,.chev{display:none}
+  :root,:root[data-theme="dark"]{
+    --ink:#142229; --ink-2:#3d4f57; --mute:#6d7f86;
+    --paper:#ffffff; --sheet:#ffffff; --rule:#bbbbbb;
+    --asagi-pale:#eef4f5; --asagi-deep:#0a5d68;
+    --warn:#8a5a00; --warn-bg:#fdf3df;
+  }
+  .filters,.areas,.chev,.themebtn{display:none}
   body{background:#fff}
   ol.list{border-color:#999}
 }
@@ -213,6 +230,7 @@ footer li{margin-bottom:4px}
 
 <header class="mast">
   <div class="wrap">
+    <button class="themebtn" id="themebtn" type="button" aria-label="ダークモードに切り替え">☾</button>
     <p class="kicker">東京ユースヘルスケア推進事業（プレコンセプションケアに係る取組）／検査費等助成事業</p>
     <h1>登録医療機関リスト<br>令和8年8月31日時点</h1>
     <p class="lede">東京都の助成事業に登録している医療機関の一覧です。エリア・受診できる対象・予約方法から絞り込み、各機関の料金と検査メニューを確認できます。</p>
@@ -455,6 +473,26 @@ function render(){
   areaSel.value=S.ward;
   testSel.value=S.test;
 }
+
+/* ---- theme ---- */
+const mqDark=matchMedia("(prefers-color-scheme: dark)");
+const themeMeta=document.querySelector('meta[name="theme-color"]');
+let themeStored=null; try{themeStored=localStorage.getItem("theme")}catch(e){}
+function applyTheme(mode){
+  document.documentElement.dataset.theme=mode;
+  themeMeta.content=mode==="dark"?"#10191d":"#0f7c8a";
+  const b=el("themebtn");
+  b.textContent=mode==="dark"?"☀︎":"☾";
+  b.setAttribute("aria-label",mode==="dark"?"ライトモードに切り替え":"ダークモードに切り替え");
+  b.title=b.getAttribute("aria-label");
+}
+applyTheme(themeStored==="dark"||themeStored==="light"?themeStored:(mqDark.matches?"dark":"light"));
+mqDark.addEventListener("change",e=>{if(!themeStored)applyTheme(e.matches?"dark":"light");});
+el("themebtn").addEventListener("click",()=>{
+  const next=document.documentElement.dataset.theme==="dark"?"light":"dark";
+  themeStored=next; try{localStorage.setItem("theme",next)}catch(e){}
+  applyTheme(next);
+});
 
 /* ---- routing (list <-> detail page) ---- */
 const baseTitle=document.title;
