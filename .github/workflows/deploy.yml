@@ -18,19 +18,22 @@ concurrency:
 
 jobs:
   build-deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: astral-sh/setup-uv@v6
+      - uses: astral-sh/setup-uv@v10.2.0
+        with:
+          # 依存は build.py のインラインメタデータ（openpyxl 1つ）だけなのでキャッシュ不要
+          enable-cache: false
 
       - name: Regenerate src/data/clinics.json from data/
         run: uv run scripts/build.py
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version-file: .node-version
           cache: npm
@@ -39,11 +42,11 @@ jobs:
 
       - run: npm run build
 
-      - uses: actions/configure-pages@v5
+      - uses: actions/configure-pages@v6
 
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: dist
 
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
