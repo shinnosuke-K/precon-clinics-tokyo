@@ -7,6 +7,8 @@ on:
 
 permissions:
   contents: read
+  # deploy-pages がアップロード済みアーティファクトを Actions API で探すのに必要
+  actions: read
   pages: write
   id-token: write
 
