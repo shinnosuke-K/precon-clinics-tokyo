@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
 
@@ -25,26 +25,23 @@ jobs:
 
       - uses: astral-sh/setup-uv@v6
 
-      - name: Regenerate index.html from data/
+      - name: Regenerate src/data/clinics.json from data/
         run: uv run scripts/build.py
 
-      - name: Commit index.html if changed
-        run: |
-          if ! git diff --quiet index.html; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add index.html
-            git commit -m "Regenerate index.html from data/ [skip ci]"
-            git push
-          else
-            echo "index.html is up to date"
-          fi
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
 
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: dist
 
       - id: deployment
         uses: actions/deploy-pages@v4

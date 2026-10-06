@@ -1,0 +1,49 @@
+---
+import { ku, shi, testCount } from "../lib/clinics";
+---
+
+<div class="filters">
+  <div class="wrap">
+    <div class="frow">
+      <input type="search" id="q" placeholder="医療機関名・住所・電話で検索（例：新宿、ART）" aria-label="医療機関名・住所・電話番号で検索" />
+      <button class="ftoggle" id="ftoggle" aria-expanded="false" aria-controls="fmore">絞り込み<span id="fcount"></span></button>
+      <div class="fmore" id="fmore">
+        <select id="area" aria-label="区市町村で絞り込み">
+          <option value="">すべての区市町村</option>
+          <optgroup label="特別区">
+            {ku.map(([w, c]) => <option value={w}>{w}（{c}）</option>)}
+          </optgroup>
+          <optgroup label="市部">
+            {shi.map(([w, c]) => <option value={w}>{w}（{c}）</option>)}
+          </optgroup>
+        </select>
+        <select id="test" aria-label="検査メニューで絞り込み">
+          <option value="">すべての検査メニュー</option>
+          <optgroup label="女性検査">
+            {[...testCount.f].map(([n, c]) => <option value={`f:${n}`}>{n}（{c}）</option>)}
+          </optgroup>
+          <optgroup label="男性検査">
+            {[...testCount.m].map(([n, c]) => <option value={`m:${n}`}>{n}（{c}）</option>)}
+          </optgroup>
+        </select>
+        <button class="chip k-f" id="c-f" aria-pressed="false">女性が受診できる</button>
+        <button class="chip k-m" id="c-m" aria-pressed="false">男性が受診できる</button>
+        <button class="chip" id="c-online" aria-pressed="false">オンライン相談可</button>
+        <button class="chip" id="c-web" aria-pressed="false">web予約可</button>
+        <button class="chip" id="c-sp" aria-pressed="false">女性ヘルスケア専門医</button>
+        <button class="chip" id="c-open" aria-pressed="false">受付中のみ</button>
+        <select id="sort" aria-label="並び順">
+          <option value="no">登録順</option>
+          <option value="fee">初診料が安い順</option>
+          <option value="tfee" id="o-tfee" hidden disabled>選択した検査が安い順</option>
+          <option value="name">五十音・アルファベット順</option>
+          <option value="new">登録が新しい順</option>
+        </select>
+      </div>
+    </div>
+    <div class="status">
+      <span><b id="count">0</b> 件を表示中<span id="filterdesc"></span></span>
+      <button class="linkbtn" id="reset" hidden>絞り込みを解除</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,55 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import ClinicDetail from "../../components/ClinicDetail.astro";
+import { baseTitle, records } from "../../lib/clinics";
+import { type Clinic, jsonld, url, yen } from "../../lib/format";
+
+export function getStaticPaths() {
+  return records.map((r) => ({ params: { n: String(r.n) }, props: { r } }));
+}
+
+interface Props {
+  r: Clinic;
+}
+const { r } = Astro.props;
+const path = `c/${r.n}/`;
+const [fee] = yen(r.fee[0]);
+const description = `${r.nm}（${r.ct}）。初診料 ${fee}。東京都プレコンセプションケア検査費等助成の登録医療機関。個人が作成した非公式ページです。`;
+
+const ld = {
+  "@context": "https://schema.org",
+  "@type": "MedicalClinic",
+  name: r.nm,
+  address: {
+    "@type": "PostalAddress",
+    addressRegion: "東京都",
+    addressLocality: r.ct,
+    streetAddress: r.ad.replace(/^東京都/, "").replace(r.ct, "").trim(),
+  },
+  url: new URL(url(path), Astro.site).href,
+  ...(r.tel ? { telephone: r.tel } : {}),
+};
+---
+
+<Layout title={`${r.nm}｜${baseTitle}`} description={description} path={path}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={jsonld(ld)} />
+  </Fragment>
+
+  <main>
+    <div class="wrap">
+      <a class="backlink" href={url("")} id="backlink">← 一覧に戻る</a>
+      <ClinicDetail r={r} />
+    </div>
+  </main>
+</Layout>
+
+<script>
+  /* 一覧から来たときは、絞り込み状態とスクロール位置を保ったまま履歴を戻る */
+  document.getElementById("backlink")!.addEventListener("click", (e) => {
+    if (history.length > 1 && document.referrer.startsWith(location.origin)) {
+      e.preventDefault();
+      history.back();
+    }
+  });
+</script>

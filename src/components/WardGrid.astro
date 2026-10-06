@@ -1,0 +1,24 @@
+---
+import { wardsSorted } from "../lib/clinics";
+
+const max = wardsSorted[0][1];
+---
+
+<section class="areas">
+  <div class="wrap">
+    <div class="sec-h">
+      <h2>エリアから探す</h2>
+      <span class="hint">クリックで絞り込み・もう一度で解除</span>
+    </div>
+    <div class="wardgrid" id="wards">
+      {wardsSorted.map(([w, c], i) => (
+        <button class:list={["ward", { more: i >= 8 }]} data-ward={w} aria-pressed="false">
+          <span class="wn">{w}</span>
+          <span class="wb"><i style={`width:${((c / max) * 100).toFixed(1)}%`}></i></span>
+          <span class="wc">{c}</span>
+        </button>
+      ))}
+      <button class="wtoggle">すべて表示（全{wardsSorted.length}エリア）</button>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,65 @@
+---
+import { type Clinic, type Test, KBLABEL, streetOf, yen } from "../lib/format";
+import { tagsHTML } from "../lib/row";
+
+interface Props {
+  r: Clinic;
+}
+const { r } = Astro.props;
+
+const fee: [string, string][] = [["初診料", r.fee[0]], ["再診料", r.fee[1]], ["助言・相談料", r.fee[2]]];
+const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.nm + " " + r.ad)}`;
+const telHref = r.tel ? `tel:${r.tel.replace(/[^0-9-]/g, "")}` : "";
+---
+
+<article class:list={["dpage", `k-${r.kb}`]}>
+  <h2 class="dnm">{r.nm}</h2>
+  <p class="meta"><span class="city">{r.ct}</span>{streetOf(r)}</p>
+  <div class="tags" set:html={tagsHTML(r)} />
+  {r.note && <p class="stopnote">{r.note}</p>}
+  <dl class="dl">
+    <dt>所在地</dt>
+    <dd>{r.ad}　<a href={mapsUrl} target="_blank" rel="noopener">Googleマップ</a></dd>
+    <dt>電話</dt>
+    <dd>{r.tel ? <a href={telHref}>{r.tel}</a> : "—"}</dd>
+    <dt>予約方法</dt>
+    <dd>{r.rv.length ? r.rv.join("／") : "—"}</dd>
+    <dt>相談方法</dt>
+    <dd>{r.cs.join("／")}</dd>
+    <dt>登録区分</dt>
+    <dd>{KBLABEL[r.kb]}の検査・助言・相談が可能{r.sp && "／日本女性医学学会認定 女性ヘルスケア専門医が在籍"}</dd>
+  </dl>
+  {r.kb2 && r.kb2 !== r.kb && (
+    <p class="asof">※一覧表の登録区分は「{KBLABEL[r.kb]}」、医療機関の届出シートは「{KBLABEL[r.kb2]}」と記載が異なります。受診前にご確認ください。</p>
+  )}
+  <div class="split">
+    <table class="tbl">
+      <caption>診察料</caption>
+      <tbody>
+        {fee.map(([k, v]) => { const [t, c] = yen(v); return <tr><th>{k}</th><td class:list={["y", c]}>{t}</td></tr>; })}
+      </tbody>
+    </table>
+    <table class="tbl">
+      <caption>必須検査</caption>
+      <tbody>
+        {r.must.map(([n, a]) => { const [t, c] = yen(a); return <tr><th>{n}</th><td class:list={["y", c]}>{t}</td></tr>; })}
+      </tbody>
+    </table>
+  </div>
+  <div class="split">
+    {([["女性の検査メニュー", r.tf], ["男性の検査メニュー", r.tm]] as [string, Test[]][]).map(([cap, items]) => items.length > 0 && (
+      <table class="tbl">
+        <caption>{cap}</caption>
+        <tbody>
+          {items.map(([name, amt, subs]) => { const [t, c] = yen(amt); return (
+            <>
+              <tr><th>{name}</th><td class:list={["y", c]}>{t}</td></tr>
+              {subs.map(([sn, sa]) => { const [t2, c2] = yen(sa); return <tr class="sub"><th>{sn}</th><td class:list={["y", c2]}>{t2}</td></tr>; })}
+            </>
+          ); })}
+        </tbody>
+      </table>
+    ))}
+  </div>
+  <p class="asof">料金・検査内容は{r.as}時点の届出内容／登録日 {r.dt.replace(/-/g, ".")}</p>
+</article>

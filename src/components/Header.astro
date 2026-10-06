@@ -1,0 +1,29 @@
+---
+import { asof, records, wardsSorted } from "../lib/clinics";
+
+const both = records.filter((r) => r.kb === "both").length;
+const sp = records.filter((r) => r.sp).length;
+---
+
+<header class="mast">
+  <div class="wrap">
+    <button class="themebtn" id="themebtn" type="button" aria-label="ダークモードに切り替え">☾</button>
+    <p class="kicker">東京ユースヘルスケア推進事業（プレコンセプションケアに係る取組）／検査費等助成事業</p>
+    <h1>登録医療機関リスト<br />{asof}</h1>
+    <p class="lede">東京都の助成事業に登録している医療機関の一覧です。エリア・受診できる対象・予約方法から絞り込み、各機関の料金と検査メニューを確認できます。</p>
+    <p class="src">
+      出典：東京都福祉局「<a href="https://www.fukushi.metro.tokyo.lg.jp/kodomo/shussan/preconceptioncare" target="_blank" rel="noopener">プレコンセプションケア</a>」ページ公開の登録医療機関リスト<br />
+      <span class="unofficial">本サイトは個人が作成した非公式のページです（東京都の運営ではありません）</span>
+    </p>
+    <div class="facts">
+      <span class="fact"><b>{records.length}</b>機関</span>
+      <span class="fact"><b>{wardsSorted.length}</b>区市町村</span>
+      <span class="fact"><b>{both}</b>機関が男女両方に対応</span>
+      <span class="fact"><b>{sp}</b>機関に女性ヘルスケア専門医</span>
+    </div>
+  </div>
+</header>
+
+<script>
+  import "../scripts/theme";
+</script>

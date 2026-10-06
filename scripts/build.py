@@ -3,16 +3,15 @@
 # requires-python = ">=3.14"
 # dependencies = ["openpyxl"]
 # ///
-"""登録医療機関一覧のExcelからindex.htmlを更新するスクリプト。
+"""登録医療機関一覧のExcelから src/data/clinics.json を生成するスクリプト。
 
 使い方:
-    uv run scripts/build.py [xlsxファイル] [htmlファイル]
+    uv run scripts/build.py [xlsxファイル] [出力JSON]
 
-引数を省略すると data/ 内で名前順最後のExcelと、リポジトリ直下の index.html を使う。
+引数を省略すると data/ 内で名前順最後のExcelを読み、src/data/clinics.json に書く。
 Excelの構成（1枚目: 登録医療機関リスト、2枚目以降: 医療機関ごとの詳細シート）を読み、
-index.html 内の `const DATA = [...];` の行、JSON-LD（application/ld+json）の行、
-「令和N年N月N日時点」の日付3箇所を置き換える。
-ページのHTML・CSS・JS本体には手を加えない。
+{"asof": "令和N年N月N日時点", "records": [...]} の形で出力する。
+ページ側（Astro）はこのJSONをビルド時にimportする。
 """
 import datetime
 import json
@@ -159,27 +158,6 @@ def build(xlsx_path):
     return records, asof
 
 
-BASE_URL = "https://shinnosuke-k.github.io/precon-clinics-tokyo/"
-
-
-def jsonld(records, asof):
-    """クローラー向けのItemList構造化データ（名称・住所・電話・URL）を生成する。"""
-    items = []
-    for r in records:
-        street = r["ad"].removeprefix("東京都").removeprefix(r["ct"]).strip()
-        item = {"@type": "MedicalClinic", "name": r["nm"],
-                "address": {"@type": "PostalAddress", "addressRegion": "東京都",
-                            "addressLocality": r["ct"], "streetAddress": street},
-                "url": f"{BASE_URL}#c/{r['n']}"}
-        if r["tel"]:
-            item["telephone"] = r["tel"]
-        items.append({"@type": "ListItem", "position": r["n"], "item": item})
-    data = {"@context": "https://schema.org", "@type": "ItemList",
-            "name": f"東京都 プレコンセプションケア 検査費等助成 登録医療機関リスト（{asof}・非公式）",
-            "numberOfItems": len(records), "itemListElement": items}
-    return json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
-
-
 def main():
     if len(sys.argv) > 1:
         xlsx = Path(sys.argv[1])
@@ -188,27 +166,14 @@ def main():
         if not candidates:
             sys.exit("data/ にExcelファイルがありません")
         xlsx = candidates[-1]
-    html_path = Path(sys.argv[2]) if len(sys.argv) > 2 else REPO / "index.html"
+    out_path = Path(sys.argv[2]) if len(sys.argv) > 2 else REPO / "src" / "data" / "clinics.json"
 
     records, asof = build(xlsx)
-    data_js = json.dumps(records, ensure_ascii=False, separators=(",", ":"))
-
-    html = html_path.read_text(encoding="utf-8")
-    html, n_data = re.subn(r"^const DATA = \[.*\];$", lambda m: f"const DATA = {data_js};",
-                           html, flags=re.M)
-    if n_data != 1:
-        sys.exit(f"index.html 内の const DATA 行が {n_data} 箇所でした（1箇所のはず）")
-    ld_js = jsonld(records, asof)
-    html, n_ld = re.subn(r'^<script type="application/ld\+json">.*</script>$',
-                         lambda m: f'<script type="application/ld+json">{ld_js}</script>',
-                         html, flags=re.M)
-    if n_ld != 1:
-        sys.exit(f"index.html 内の JSON-LD 行が {n_ld} 箇所でした（1箇所のはず）")
-    html, n_date = re.subn(r"令和\d+年\d+月\d+日時点", asof, html)
-
-    html_path.write_text(html, encoding="utf-8")
-    print(f"{xlsx.name} から {len(records)} 機関を読み込み、{html_path.name} を更新しました"
-          f"（{asof}、日付の置換 {n_date} 箇所）")
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(json.dumps({"asof": asof, "records": records},
+                                   ensure_ascii=False, separators=(",", ":")) + "\n",
+                        encoding="utf-8")
+    print(f"{xlsx.name} から {len(records)} 機関を読み込み、{out_path.relative_to(REPO)} に書きました（{asof}）")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,48 @@
+---
+import Layout from "../layouts/Layout.astro";
+import WardGrid from "../components/WardGrid.astro";
+import Filters from "../components/Filters.astro";
+import { asof, records } from "../lib/clinics";
+import { clinicUrl, jsonld } from "../lib/format";
+import { rowHTML } from "../lib/row";
+
+const ld = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: `東京都 プレコンセプションケア 検査費等助成 登録医療機関リスト（${asof}・非公式）`,
+  numberOfItems: records.length,
+  itemListElement: records.map((r) => ({
+    "@type": "ListItem",
+    position: r.n,
+    url: new URL(clinicUrl(r.n), Astro.site).href,
+  })),
+};
+---
+
+<Layout>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={jsonld(ld)} />
+    <script is:inline define:vars={{ base: import.meta.env.BASE_URL }}>
+      /* 旧URL（#c/N）で開かれたら詳細ページへ送る */
+      var m = location.hash.match(/^#c\/(\d+)$/);
+      if (m) location.replace(base.replace(/\/$/, "") + "/c/" + m[1] + "/");
+    </script>
+  </Fragment>
+
+  <WardGrid />
+  <Filters />
+
+  <main>
+    <div class="wrap">
+      <ol class="list" id="list" set:html={records.map((r) => rowHTML(r)).join("")} />
+      <div class="empty" id="empty" hidden><b>該当する医療機関がありません</b>条件をゆるめるか、検索語を変えてお試しください。</div>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  import data from "../data/clinics.json";
+  import type { Clinic } from "../lib/format";
+  import { init } from "../scripts/filter";
+  init(data.records as Clinic[]);
+</script>
