@@ -10,7 +10,8 @@
 
 引数を省略すると data/ 内で名前順最後のExcelと、リポジトリ直下の index.html を使う。
 Excelの構成（1枚目: 登録医療機関リスト、2枚目以降: 医療機関ごとの詳細シート）を読み、
-index.html 内の `const DATA = [...];` の行と「令和N年N月N日時点」の日付3箇所を置き換える。
+index.html 内の `const DATA = [...];` の行、JSON-LD（application/ld+json）の行、
+「令和N年N月N日時点」の日付3箇所を置き換える。
 ページのHTML・CSS・JS本体には手を加えない。
 """
 import datetime
@@ -158,6 +159,27 @@ def build(xlsx_path):
     return records, asof
 
 
+BASE_URL = "https://shinnosuke-k.github.io/precon-clinics-tokyo/"
+
+
+def jsonld(records, asof):
+    """クローラー向けのItemList構造化データ（名称・住所・電話・URL）を生成する。"""
+    items = []
+    for r in records:
+        street = r["ad"].removeprefix("東京都").removeprefix(r["ct"]).strip()
+        item = {"@type": "MedicalClinic", "name": r["nm"],
+                "address": {"@type": "PostalAddress", "addressRegion": "東京都",
+                            "addressLocality": r["ct"], "streetAddress": street},
+                "url": f"{BASE_URL}#c/{r['n']}"}
+        if r["tel"]:
+            item["telephone"] = r["tel"]
+        items.append({"@type": "ListItem", "position": r["n"], "item": item})
+    data = {"@context": "https://schema.org", "@type": "ItemList",
+            "name": f"東京都 プレコンセプションケア 検査費等助成 登録医療機関リスト（{asof}・非公式）",
+            "numberOfItems": len(records), "itemListElement": items}
+    return json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
+
+
 def main():
     if len(sys.argv) > 1:
         xlsx = Path(sys.argv[1])
@@ -176,6 +198,12 @@ def main():
                            html, flags=re.M)
     if n_data != 1:
         sys.exit(f"index.html 内の const DATA 行が {n_data} 箇所でした（1箇所のはず）")
+    ld_js = jsonld(records, asof)
+    html, n_ld = re.subn(r'^<script type="application/ld\+json">.*</script>$',
+                         lambda m: f'<script type="application/ld+json">{ld_js}</script>',
+                         html, flags=re.M)
+    if n_ld != 1:
+        sys.exit(f"index.html 内の JSON-LD 行が {n_ld} 箇所でした（1箇所のはず）")
     html, n_date = re.subn(r"令和\d+年\d+月\d+日時点", asof, html)
 
     html_path.write_text(html, encoding="utf-8")

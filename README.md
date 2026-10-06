@@ -36,7 +36,7 @@
 GitHub Actions（`.github/workflows/deploy.yml`）がpushを検知して次を自動で行います。
 
 1. `scripts/build.py` を実行し、`data/` 内で名前順最後のExcelから `index.html` を再生成
-   （`DATA` 配列と「令和N年N月N日時点」の日付3箇所が置き換わる。デザインやJS本体は不変）
+   （`DATA` 配列・JSON-LD・「令和N年N月N日時点」の日付が置き換わる。デザインやJS本体は不変）
 2. `index.html` に変更があればbotとしてコミット・push
 3. GitHub Pages へデプロイ
 
