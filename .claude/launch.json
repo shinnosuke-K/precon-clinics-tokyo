@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "astro-dev",
+      "runtimeExecutable": "mise",
+      "runtimeArgs": ["x", "node@22.23.2", "--", "npm", "run", "dev", "--", "--port", "4321"],
+      "port": 4321
+    }
+  ]
+}
