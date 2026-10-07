@@ -23,6 +23,7 @@
   --stop-border:#574a27; --stopnote-border:#8a7336;
   --alert:#e0766a;
 }
+:root{--font-head:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Rounded Mplus 1c","Hiragino Sans","Yu Gothic","Noto Sans JP",sans-serif}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{
@@ -42,8 +43,8 @@ header.mast{background:var(--sheet);border-bottom:1px solid var(--rule)}
   background:var(--sheet);border:1px solid var(--rule);color:var(--ink-2);cursor:pointer}
 .themebtn:hover{background:var(--asagi-pale)}
 h1{
-  font-family:"Hiragino Mincho ProN","Yu Mincho","YuMincho","Noto Serif JP",serif;
-  font-size:clamp(23px,3.6vw,33px); line-height:1.35; font-weight:600; margin:0 0 10px;
+  font-family:var(--font-head);
+  font-size:clamp(23px,3.6vw,33px); line-height:1.35; font-weight:700; margin:0 0 10px;
 }
 .lede{margin:0;max-width:62ch;color:var(--ink-2);font-size:15px}
 .src{margin:8px 0 0;font-size:13px;color:var(--mute)}
@@ -56,7 +57,7 @@ h1{
 section.areas{background:var(--sheet);border-bottom:1px solid var(--rule)}
 .areas .wrap{padding:20px 20px 24px}
 .sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0 0 12px}
-.sec-h h2{font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;font-size:17px;font-weight:600;margin:0}
+.sec-h h2{font-family:var(--font-head);font-size:17px;font-weight:700;margin:0}
 .sec-h .hint{font-size:13px;color:var(--mute)}
 .wtoggle{display:none}
 .wardgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px 26px}
@@ -120,7 +121,7 @@ li.item:last-child{border-bottom:0}
 .dpage{background:var(--sheet);border:1px solid var(--rule);border-top:3px solid var(--both);padding:22px 24px 32px}
 .dpage.k-f{border-top-color:var(--female)}
 .dpage.k-m{border-top-color:var(--male)}
-.dnm{font-family:"Hiragino Mincho ProN","Yu Mincho","YuMincho","Noto Serif JP",serif;font-size:clamp(20px,3vw,27px);font-weight:600;line-height:1.4;margin:0 0 4px;overflow-wrap:anywhere}
+.dnm{font-family:var(--font-head);font-size:clamp(20px,3vw,27px);font-weight:700;line-height:1.4;margin:0 0 4px;overflow-wrap:anywhere}
 .stopnote{margin:14px 0 0;padding:10px 12px;background:var(--warn-bg);border-left:3px solid var(--stopnote-border);font-size:13.5px;color:var(--warn)}
 .dl{display:grid;grid-template-columns:6.5em 1fr;gap:4px 14px;margin:16px 0 0;font-size:14.5px}
 .dl dt{color:var(--mute);font-size:13.5px;padding-top:2px}
