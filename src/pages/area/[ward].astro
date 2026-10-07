@@ -1,0 +1,65 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import PageLinks from "../../components/PageLinks.astro";
+import { asof } from "../../lib/clinics";
+import { clinicUrl, hasWeb, jsonld, url } from "../../lib/format";
+import { areaPages } from "../../lib/pages";
+import { rowHTML } from "../../lib/row";
+
+export function getStaticPaths() {
+  return areaPages.map((p) => ({ params: { ward: p.ward }, props: { page: p } }));
+}
+
+interface Props {
+  page: (typeof areaPages)[number];
+}
+const { page } = Astro.props;
+const { ward, rows, path } = page;
+const n = rows.length;
+const both = rows.filter((r) => r.kb === "both").length;
+const f = rows.filter((r) => r.kb === "f").length;
+const m = rows.filter((r) => r.kb === "m").length;
+const web = rows.filter(hasWeb).length;
+const facts = [
+  both && `男女どちらも受診できる ${both}件`,
+  f && `女性のみ ${f}件`,
+  m && `男性のみ ${m}件`,
+  web && `web予約可 ${web}件`,
+].filter(Boolean);
+
+const title = `${ward}のプレコンセプションケア 検査費等助成 登録医療機関（${n}件）｜非公式`;
+const description = `東京都${ward}でプレコンセプションケア検査費等助成が使える登録医療機関${n}件の一覧（${asof}）。受診できる対象・初診料・予約方法を一覧で確認できます。個人が作成した非公式ページです。`;
+const filterUrl = url(`?ward=${encodeURIComponent(ward)}`);
+
+const ld = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: title,
+  numberOfItems: n,
+  itemListElement: rows.map((r, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    name: r.nm,
+    url: new URL(clinicUrl(r.n), Astro.site).href,
+  })),
+};
+---
+
+<Layout title={title} description={description} path={path}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={jsonld(ld)} />
+  </Fragment>
+
+  <main>
+    <div class="wrap">
+      <a class="backlink" href={url("")}>← 一覧に戻る</a>
+      <h2 class="ph">{ward}の登録医療機関<span class="cnt">{n}件</span></h2>
+      <p class="pdesc">
+        {facts.join("・")}。
+        <a href={filterUrl}>一覧で検査メニューや予約方法から絞り込む</a>
+      </p>
+      <ol class="list" set:html={rows.map((r) => rowHTML(r)).join("")} />
+      <PageLinks current={path} />
+    </div>
+  </main>
+</Layout>

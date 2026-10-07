@@ -105,13 +105,14 @@ export function init(DATA: Clinic[]) {
     const wc: Record<string, number> = {};
     for (const r of DATA) if (matchBase(r)) wc[r.ct] = (wc[r.ct] || 0) + 1;
     const wmax = Math.max(1, ...Object.values(wc));
-    document.querySelectorAll<HTMLButtonElement>(".ward").forEach((b) => {
+    document.querySelectorAll<HTMLAnchorElement>(".ward").forEach((b) => {
       const w = b.dataset.ward!;
       const c = wc[w] || 0;
       b.querySelector(".wc")!.textContent = String(c);
       b.querySelector<HTMLElement>(".wb i")!.style.width = ((c / wmax) * 100).toFixed(1) + "%";
       b.classList.toggle("z", !c);
-      b.setAttribute("aria-pressed", String(w === S.ward));
+      if (w === S.ward) b.setAttribute("aria-current", "true");
+      else b.removeAttribute("aria-current");
     });
     for (const o of areaSel.options) if (o.value) o.textContent = `${o.value}（${wc[o.value] || 0}）`;
     areaSel.value = S.ward;
@@ -128,6 +129,8 @@ export function init(DATA: Clinic[]) {
     }
     const b = t.closest<HTMLElement>(".ward");
     if (!b) return;
+    /* エリアは区ページへのリンクだが、JSが動くときはその場で絞り込む */
+    e.preventDefault();
     S.ward = S.ward === b.dataset.ward ? "" : b.dataset.ward!;
     render();
   });

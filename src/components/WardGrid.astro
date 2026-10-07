@@ -1,5 +1,7 @@
 ---
 import { wardsSorted } from "../lib/clinics";
+import { areaPath } from "../lib/pages";
+import { url } from "../lib/format";
 
 const max = wardsSorted[0][1];
 ---
@@ -12,11 +14,11 @@ const max = wardsSorted[0][1];
     </div>
     <div class="wardgrid" id="wards">
       {wardsSorted.map(([w, c], i) => (
-        <button class:list={["ward", { more: i >= 8 }]} data-ward={w} aria-pressed="false">
+        <a class:list={["ward", { more: i >= 8 }]} href={url(areaPath(w))} data-ward={w}>
           <span class="wn">{w}</span>
           <span class="wb"><i style={`width:${((c / max) * 100).toFixed(1)}%`}></i></span>
           <span class="wc">{c}</span>
-        </button>
+        </a>
       ))}
       <button class="wtoggle">すべて表示（全{wardsSorted.length}エリア）</button>
     </div>

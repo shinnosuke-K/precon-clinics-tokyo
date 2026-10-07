@@ -42,6 +42,7 @@ const ogImage = new URL(url("asset/ogp.png"), Astro.site).href;
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image:alt" content="東京都 プレコンセプションケア 検査費等助成 登録医療機関リスト（個人作成の非公式サイト）" />
     <link rel="canonical" href={canonical} />
+    <link rel="sitemap" type="application/xml" href={url("sitemap-index.xml")} />
     <slot name="head" />
     <script is:inline>
       /* 描画前にテーマを決めてちらつきを防ぐ。保存された選択がなければOS設定に追従 */

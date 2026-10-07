@@ -1,0 +1,61 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import PageLinks from "../../../components/PageLinks.astro";
+import { asof } from "../../../lib/clinics";
+import { amtNum, clinicUrl, jsonld, url } from "../../../lib/format";
+import { SIDELABEL, type TestPage, testPages } from "../../../lib/pages";
+import { rowHTML, testOf } from "../../../lib/row";
+
+export function getStaticPaths() {
+  return testPages.map((t) => ({ params: { side: t.side, slug: t.slug }, props: { t } }));
+}
+
+interface Props {
+  t: TestPage;
+}
+const { t } = Astro.props;
+const { side, name, key, rows, path } = t;
+const n = rows.length;
+const label = `${name}（${SIDELABEL[side]}）`;
+const prices = rows.map((r) => amtNum(testOf(r, key)![1])).filter(Number.isFinite);
+const yen = (v: number) => (v === 0 ? "無料" : "¥" + v.toLocaleString());
+const range = prices.length
+  ? `料金は ${yen(prices[0])}〜${yen(prices[prices.length - 1])}（金額の記載がある${prices.length}件）`
+  : "";
+
+const title = `${label}が受けられるプレコンセプションケア 登録医療機関（${n}件・料金順）｜非公式`;
+const description = `東京都のプレコンセプションケア検査費等助成で${label}を実施している登録医療機関${n}件を、料金の安い順に並べた一覧（${asof}）。${range ? range + "。" : ""}個人が作成した非公式ページです。`;
+const filterUrl = url(`?test=${encodeURIComponent(key)}&sort=tfee`);
+
+const ld = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: title,
+  numberOfItems: n,
+  itemListElement: rows.map((r, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    name: r.nm,
+    url: new URL(clinicUrl(r.n), Astro.site).href,
+  })),
+};
+---
+
+<Layout title={title} description={description} path={path}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={jsonld(ld)} />
+  </Fragment>
+
+  <main>
+    <div class="wrap">
+      <a class="backlink" href={url("")}>← 一覧に戻る</a>
+      <h2 class="ph">{label}が受けられる登録医療機関<span class="cnt">{n}件</span></h2>
+      <p class="pdesc">
+        料金の安い順に並べています（金額が「詳細を参照」の機関は末尾）。{range && range + "。"}
+        <a href={filterUrl}>一覧でエリアや予約方法から絞り込む</a>
+      </p>
+      <ol class="list" set:html={rows.map((r) => rowHTML(r, key)).join("")} />
+      <PageLinks current={path} />
+    </div>
+  </main>
+</Layout>

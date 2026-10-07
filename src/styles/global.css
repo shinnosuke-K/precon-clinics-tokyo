@@ -62,14 +62,14 @@ section.areas{background:var(--sheet);border-bottom:1px solid var(--rule)}
 .wtoggle{display:none}
 .wardgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px 26px}
 .ward{display:grid;grid-template-columns:5.2em 1fr 2.2em;align-items:center;gap:8px;
-  background:none;border:0;padding:3px 4px;cursor:pointer;text-align:left;font:inherit;color:inherit;border-radius:3px}
+  background:none;border:0;padding:3px 4px;cursor:pointer;text-align:left;font:inherit;color:inherit;border-radius:3px;text-decoration:none}
 .ward:hover{background:var(--asagi-pale)}
 .ward .wn{font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ward .wb{height:9px;background:var(--asagi-pale);position:relative}
 .ward .wb i{position:absolute;inset:0 auto 0 0;background:var(--asagi);opacity:.72}
 .ward .wc{font-size:12.5px;color:var(--mute);text-align:right;font-feature-settings:"tnum" 1}
-.ward[aria-pressed="true"]{background:var(--asagi-pale)}
-.ward[aria-pressed="true"] .wn{font-weight:700;color:var(--asagi-deep)}
+.ward[aria-current]{background:var(--asagi-pale)}
+.ward[aria-current] .wn{font-weight:700;color:var(--asagi-deep)}
 .ward.z{opacity:.45}
 
 /* filters */
@@ -116,6 +116,17 @@ li.item:last-child{border-bottom:0}
 .chev{align-self:center;padding:0 14px;color:var(--mute);font-size:13px;white-space:nowrap;display:flex;align-items:center;gap:4px}
 .chev svg{display:block}
 
+/* area / test pages */
+.ph{font-family:var(--font-head);font-size:clamp(20px,3vw,26px);font-weight:700;line-height:1.4;margin:0 0 6px}
+.ph .cnt{font-size:.62em;font-weight:400;color:var(--mute);margin-left:.5em;font-feature-settings:"tnum" 1}
+.pdesc{margin:0 0 16px;font-size:14.5px;color:var(--ink-2)}
+.pagelinks{margin-top:36px;padding-top:18px;border-top:1px solid var(--rule)}
+.pagelinks h2{font-family:var(--font-head);font-size:16px;font-weight:700;margin:0 0 10px}
+.pagelinks .lbl{margin:10px 0 4px;font-size:13px;color:var(--mute)}
+.pagelinks ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:4px 16px;font-size:13.5px}
+.pagelinks a[aria-current]{font-weight:700;color:var(--ink);text-decoration:none}
+.pagelinks .n{color:var(--mute);font-size:12px;margin-left:3px;font-feature-settings:"tnum" 1}
+
 /* detail page */
 .backlink{display:inline-block;margin:0 0 14px;font-size:14px;color:var(--asagi-deep)}
 .dpage{background:var(--sheet);border:1px solid var(--rule);border-top:3px solid var(--both);padding:22px 24px 32px}
@@ -158,11 +169,11 @@ footer li{margin-bottom:4px}
   .ward .wb{display:none}
   .ward .wn{font-size:13px}
   .ward .wc{font-size:12px}
-  .ward[aria-pressed="true"]{background:var(--asagi);border-color:var(--asagi)}
-  .ward[aria-pressed="true"] .wn{color:#fff;font-weight:600}
-  .ward[aria-pressed="true"] .wc{color:#d6eaec}
+  .ward[aria-current]{background:var(--asagi);border-color:var(--asagi)}
+  .ward[aria-current] .wn{color:#fff;font-weight:600}
+  .ward[aria-current] .wc{color:#d6eaec}
   .wardgrid:not(.expanded) .ward.more{display:none}
-  .wardgrid:not(.expanded) .ward.more[aria-pressed="true"]{display:inline-flex}
+  .wardgrid:not(.expanded) .ward.more[aria-current]{display:inline-flex}
   .wtoggle{display:inline-flex;align-items:center;font:inherit;font-size:13px;padding:6px 12px;
     background:none;border:1px dashed var(--rule);border-radius:999px;color:var(--asagi-deep);cursor:pointer}
   .wardgrid.expanded .wtoggle{display:none}
@@ -187,7 +198,7 @@ footer li{margin-bottom:4px}
     --asagi-pale:#eef4f5; --asagi-deep:#0a5d68;
     --warn:#8a5a00; --warn-bg:#fdf3df;
   }
-  .filters,.areas,.chev,.themebtn{display:none}
+  .filters,.areas,.chev,.themebtn,.pagelinks{display:none}
   body{background:#fff}
   ol.list{border-color:#999}
 }

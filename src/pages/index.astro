@@ -2,6 +2,7 @@
 import Layout from "../layouts/Layout.astro";
 import WardGrid from "../components/WardGrid.astro";
 import Filters from "../components/Filters.astro";
+import PageLinks from "../components/PageLinks.astro";
 import { asof, records } from "../lib/clinics";
 import { clinicUrl, jsonld } from "../lib/format";
 import { rowHTML } from "../lib/row";
@@ -36,6 +37,7 @@ const ld = {
     <div class="wrap">
       <ol class="list" id="list" set:html={records.map((r) => rowHTML(r)).join("")} />
       <div class="empty" id="empty" hidden><b>該当する医療機関がありません</b>条件をゆるめるか、検索語を変えてお試しください。</div>
+      <PageLinks />
     </div>
   </main>
 </Layout>

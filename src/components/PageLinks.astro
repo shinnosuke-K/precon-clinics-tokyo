@@ -1,0 +1,37 @@
+---
+/* 区市町村別・検査メニュー別ページへのリンク一覧。トップと各ページの末尾に置き、クローラと利用者の両方の導線にする */
+import { ku, shi } from "../lib/clinics";
+import { url } from "../lib/format";
+import { SIDELABEL, areaPath, testPages, testUrl } from "../lib/pages";
+
+interface Props {
+  /** 表示中のページのパス（base なし）。該当リンクを強調する */
+  current?: string;
+}
+const { current = "" } = Astro.props;
+const cur = (path: string) => (path === current ? "page" : undefined);
+---
+
+<nav class="pagelinks" aria-label="エリア別・検査メニュー別ページ">
+  <h2>区市町村別・検査メニュー別のページ</h2>
+  {([["特別区", ku], ["市部", shi]] as [string, [string, number][]][]).map(([label, wards]) => (
+    <>
+      <p class="lbl">{label}</p>
+      <ul>
+        {wards.map(([w, c]) => (
+          <li><a href={url(areaPath(w))} aria-current={cur(areaPath(w))}>{w}<span class="n">{c}</span></a></li>
+        ))}
+      </ul>
+    </>
+  ))}
+  {(["f", "m"] as const).map((side) => (
+    <>
+      <p class="lbl">{SIDELABEL[side]}の検査メニュー</p>
+      <ul>
+        {testPages.filter((t) => t.side === side).map((t) => (
+          <li><a href={testUrl(t)} aria-current={cur(t.path)}>{t.name}<span class="n">{t.rows.length}</span></a></li>
+        ))}
+      </ul>
+    </>
+  ))}
+</nav>
