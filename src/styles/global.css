@@ -23,7 +23,7 @@
   --stop-border:#574a27; --stopnote-border:#8a7336;
   --alert:#e0766a;
 }
-:root{--font-head:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Rounded Mplus 1c","Hiragino Sans","Yu Gothic","Noto Sans JP",sans-serif}
+:root{--font-head:"BIZ UDPGothic","Hiragino Sans","Yu Gothic Medium","Yu Gothic","Noto Sans JP",Meiryo,sans-serif}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{
