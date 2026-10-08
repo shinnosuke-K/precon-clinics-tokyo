@@ -192,6 +192,21 @@ li.item .row-head{flex:1 1 auto;min-width:0}
 .empty{padding:40px 20px;text-align:center;color:var(--mute);background:var(--sheet);border:1px solid var(--rule)}
 .empty b{display:block;color:var(--ink);font-size:16px;margin-bottom:4px}
 
+/* compare bar */
+.cbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--glass);backdrop-filter:blur(6px);border-top:1px solid var(--rule)}
+.cbar[hidden]{display:none}
+.cbar .wrap{display:flex;align-items:center;gap:14px;padding:10px 20px}
+.cbar .cnames{flex:1 1 auto;min-width:0;font-size:13px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cbar .cnames b{color:var(--ink);font-weight:600}
+.cbtn{font:inherit;font-size:14px;font-weight:700;padding:9px 16px;background:var(--asagi);color:#fff;border:0;border-radius:2px;text-decoration:none;white-space:nowrap}
+.cbtn:focus-visible{outline:2px solid var(--ink);outline-offset:1px}
+.cbar .linkbtn{white-space:nowrap}
+.cmsg{font-size:13px;color:var(--warn)}
+.cmsg:empty{display:none}
+body.has-cbar{padding-bottom:64px}
+.dpin{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.dpin .pin{margin:0;position:static;font-size:13px;padding:7px 12px}
+
 footer{border-top:1px solid var(--rule);background:var(--sheet)}
 footer .wrap{padding:22px 20px 40px;font-size:13px;color:var(--mute)}
 footer ul{margin:8px 0 0;padding-left:1.2em}
@@ -220,6 +235,9 @@ footer li{margin-bottom:4px}
     background:none;border:1px dashed var(--rule);border-radius:999px;color:var(--asagi-deep);cursor:pointer}
   .wardgrid.expanded .wtoggle{display:none}
   .chev span{display:none}
+  .cbar .cnames{display:none}
+  .cbar .wrap{gap:10px;padding:10px 16px}
+  .cmsg{flex-basis:100%}
   .filters.open,.filters.eopen{position:static}
   .etoggle{font-size:13px;padding:7px 10px}
   .echecks{display:grid;grid-template-columns:1fr 1fr;gap:6px}
@@ -251,7 +269,7 @@ footer li{margin-bottom:4px}
     --asagi-pale:#eef4f5; --asagi-deep:#0a5d68;
     --warn:#8a5a00; --warn-bg:#fdf3df;
   }
-  .filters,.areas,.chev,.themebtn,.pagelinks,.pin{display:none}
+  .filters,.areas,.chev,.themebtn,.pagelinks,.pin,.cbar{display:none}
   body{background:#fff}
   ol.list{border-color:#999}
 }

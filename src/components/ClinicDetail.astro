@@ -1,6 +1,6 @@
 ---
 import { type Clinic, type Test, KBLABEL, streetOf, yen } from "../lib/format";
-import { tagsHTML } from "../lib/row";
+import { pinHTML, tagsHTML } from "../lib/row";
 
 interface Props {
   r: Clinic;
@@ -15,7 +15,10 @@ const telHref = r.tel ? `tel:${r.tel.replace(/[^0-9-]/g, "")}` : "";
 <article class:list={["dpage", `k-${r.kb}`]}>
   <h2 class="dnm">{r.nm}</h2>
   <p class="meta"><span class="city">{r.ct}</span>{streetOf(r)}</p>
-  <div class="tags" set:html={tagsHTML(r)} />
+  <div class="dpin">
+    <div class="tags" set:html={tagsHTML(r)} />
+    <Fragment set:html={pinHTML(r, "比較中（外す）", "比較に追加")} />
+  </div>
   {r.note && <p class="stopnote">{r.note}</p>}
   <dl class="dl">
     <dt>所在地</dt>
