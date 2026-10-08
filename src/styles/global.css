@@ -127,6 +127,21 @@ li.item:last-child{border-bottom:0}
 .pagelinks a[aria-current]{font-weight:700;color:var(--ink);text-decoration:none}
 .pagelinks .n{color:var(--mute);font-size:12px;margin-left:3px;font-feature-settings:"tnum" 1}
 
+/* list: estimate line and compare pin */
+li.item{display:flex;align-items:stretch}
+li.item .row-head{flex:1 1 auto;min-width:0}
+.pin{align-self:center;margin:0 14px 0 0;font:inherit;font-size:12.5px;line-height:1;padding:7px 10px;
+  border:1px solid var(--rule);border-radius:999px;background:var(--sheet);color:var(--ink-2);cursor:pointer;white-space:nowrap}
+.pin:hover{border-color:var(--asagi)}
+.pin[aria-pressed="true"]{background:var(--sel);border-color:var(--sel);color:var(--sel-fg)}
+.pin:focus-visible{outline:2px solid var(--asagi);outline-offset:1px}
+.tag.tp.na{background:var(--paper);border-color:var(--rule);color:var(--mute)}
+.estline{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;margin-top:8px;font-size:14px;color:var(--ink-2)}
+.estline b{font-size:17px;color:var(--asagi-deep);font-feature-settings:"tnum" 1}
+.estline .copay{font-feature-settings:"tnum" 1}
+.estline small{color:var(--warn);font-size:12.5px}
+.estline.na{color:var(--warn);font-weight:600}
+
 /* detail page */
 .backlink{display:inline-block;margin:0 0 14px;font-size:14px;color:var(--asagi-deep)}
 .dpage{background:var(--sheet);border:1px solid var(--rule);border-top:3px solid var(--both);padding:22px 24px 32px}
@@ -178,6 +193,12 @@ footer li{margin-bottom:4px}
     background:none;border:1px dashed var(--rule);border-radius:999px;color:var(--asagi-deep);cursor:pointer}
   .wardgrid.expanded .wtoggle{display:none}
   .chev span{display:none}
+  li.item{position:relative}
+  li.item .nm{padding-right:4.5em}
+  .pin{position:absolute;top:10px;right:10px;margin:0;font-size:12px;padding:5px 9px}
+  #list .tag.tp{display:none} /* トップの一覧だけ。検査ページではその検査の料金が並び順の根拠なので残す */
+  .estline{margin-top:6px}
+  .estline b{font-size:18px}
   .frow input[type=search]{flex:1 1 auto;min-width:0}
   .ftoggle{display:inline-flex;align-items:center;font:inherit;font-size:13.5px;min-height:40px;padding:7px 12px;
     background:var(--sheet);border:1px solid var(--rule);border-radius:2px;color:var(--ink-2);cursor:pointer;white-space:nowrap}
@@ -198,7 +219,7 @@ footer li{margin-bottom:4px}
     --asagi-pale:#eef4f5; --asagi-deep:#0a5d68;
     --warn:#8a5a00; --warn-bg:#fdf3df;
   }
-  .filters,.areas,.chev,.themebtn,.pagelinks{display:none}
+  .filters,.areas,.chev,.themebtn,.pagelinks,.pin{display:none}
   body{background:#fff}
   ol.list{border-color:#999}
 }
