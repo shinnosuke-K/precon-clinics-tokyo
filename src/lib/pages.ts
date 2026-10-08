@@ -1,11 +1,8 @@
 /* 区市町村ページ・検査メニューページの定義。トップのリンク一覧と各ページの生成で共用する */
 import { records, testCount, wardsSorted } from "./clinics";
 import { type Clinic, amtNum, url } from "./format";
+import { slug } from "./query";
 import { testOf } from "./row";
-
-/** 検査名をURL用に直す。全角英数は半角にし、括弧や空白は「-」に置き換える（例: ＡＭＨ検査 → AMH検査） */
-export const slug = (s: string) =>
-  s.normalize("NFKC").replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "");
 
 export const areaPath = (ward: string) => `area/${ward}/`;
 
