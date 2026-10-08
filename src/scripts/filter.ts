@@ -165,7 +165,6 @@ export function init(DATA: Clinic[]) {
     el("list").innerHTML = rows.map((r) => rowHTML(r, { g: S.g, tests: S.tests, est: true })).join("");
     el("empty").hidden = rows.length > 0;
     el("list").hidden = rows.length === 0;
-    document.dispatchEvent(new CustomEvent("rows:rendered"));
     /* エリアの件数・バーを、エリア以外の条件を適用した状態に合わせる */
     const wc: Record<string, number> = {};
     for (const r of DATA) if (matchBase(r)) wc[r.ct] = (wc[r.ct] || 0) + 1;
@@ -182,6 +181,8 @@ export function init(DATA: Clinic[]) {
     for (const o of areaSel.options) if (o.value) o.textContent = `${o.value}（${wc[o.value] || 0}）`;
     areaSel.value = S.ward;
     writeQuery();
+    /* URL を更新した後に通知する（compare.ts が比較リンクに g/t を引き継ぐため） */
+    document.dispatchEvent(new CustomEvent("rows:rendered"));
   }
 
   /* ---- events ---- */
@@ -250,8 +251,9 @@ export function init(DATA: Clinic[]) {
 
   readQuery();
   syncControls();
-  /* 復元した絞り込みがあれば、折りたたみを開いて見えるようにする */
-  if ([S.ward, ...FLAGS.map((k) => S[k])].some(Boolean)) {
+  /* 復元した絞り込みがあれば、折りたたみを開いて見えるようにする（見積もりで固定したチップは数えない。
+     見積もりパネルと両方開くとモバイルで一覧が画面外に押し出されるため） */
+  if ([S.ward, ...FLAGS.filter((k) => k !== S.g).map((k) => S[k])].some(Boolean)) {
     filters.classList.add("open");
     el("ftoggle").setAttribute("aria-expanded", "true");
   }

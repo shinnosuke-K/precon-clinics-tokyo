@@ -1,6 +1,7 @@
 /* 区市町村ページ・検査メニューページの定義。トップのリンク一覧と各ページの生成で共用する */
 import { records, testCount, wardsSorted } from "./clinics";
-import { type Clinic, amtNum, url } from "./format";
+import { type Clinic, url } from "./format";
+import { type Test, testCost } from "./estimate";
 import { slug } from "./query";
 import { testOf } from "./row";
 
@@ -20,10 +21,16 @@ export interface TestPage {
   rows: Clinic[];
 }
 
+/** 並び順・料金幅に使う金額。数値で決まらないもの（含む・要確認なし）は末尾に回す */
+export const testPrice = (t: Test) => {
+  const a = testCost(t);
+  return a.kind === "num" || a.kind === "approx" ? a.yen : Infinity;
+};
+
 export const testPages: TestPage[] = (["f", "m"] as Side[]).flatMap((side) =>
   [...testCount[side].keys()].map((name) => {
     const key = `${side}:${name}`;
-    const price = (r: Clinic) => amtNum(testOf(r, key)![1]);
+    const price = (r: Clinic) => testPrice(testOf(r, key)!);
     const rows = records.filter((r) => testOf(r, key)).sort((a, b) => price(a) - price(b) || a.n - b.n);
     const s = slug(name);
     return { side, name, key, slug: s, path: `test/${side}/${s}/`, rows };

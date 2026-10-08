@@ -2,8 +2,8 @@
 import Layout from "../../../layouts/Layout.astro";
 import PageLinks from "../../../components/PageLinks.astro";
 import { asof } from "../../../lib/clinics";
-import { amtNum, clinicUrl, jsonld, url } from "../../../lib/format";
-import { SIDELABEL, type TestPage, testPages } from "../../../lib/pages";
+import { clinicUrl, jsonld, url } from "../../../lib/format";
+import { SIDELABEL, type TestPage, testPages, testPrice } from "../../../lib/pages";
 import { rowHTML, testOf } from "../../../lib/row";
 
 export function getStaticPaths() {
@@ -17,7 +17,7 @@ const { t } = Astro.props;
 const { side, name, key, rows, path } = t;
 const n = rows.length;
 const label = `${name}（${SIDELABEL[side]}）`;
-const prices = rows.map((r) => amtNum(testOf(r, key)![1])).filter(Number.isFinite);
+const prices = rows.map((r) => testPrice(testOf(r, key)!)).filter(Number.isFinite);
 const yen = (v: number) => (v === 0 ? "無料" : "¥" + v.toLocaleString());
 const range = prices.length
   ? `料金は ${yen(prices[0])}〜${yen(prices[prices.length - 1])}（金額の記載がある${prices.length}件）`
@@ -51,7 +51,7 @@ const ld = {
       <a class="backlink" href={url("")}>← 一覧に戻る</a>
       <h2 class="ph">{label}が受けられる登録医療機関<span class="cnt">{n}件</span></h2>
       <p class="pdesc">
-        料金の安い順に並べています（金額が「詳細を参照」の機関は末尾）。{range && range + "。"}
+        料金の安い順に並べています（サブ項目のある検査はその合計。金額が「詳細を参照」の機関は末尾）。{range && range + "。"}
         <a href={filterUrl}>一覧でエリアや予約方法から絞り込む</a>
       </p>
       <ol class="list" set:html={rows.map((r) => rowHTML(r, { g: side, tests: [name] })).join("")} />

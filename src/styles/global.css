@@ -280,6 +280,8 @@ footer li{margin-bottom:4px}
   .cmsg{flex-basis:100%}
   .filters.open,.filters.eopen{position:static}
   .etoggle{font-size:13px;padding:7px 10px}
+  /* 検索欄を1行に、その下に「絞り込み」「費用を見積もる」を並べる（3段目に1つだけ落ちるのを防ぐ） */
+  .ftoggle,.etoggle{flex:1 1 0;justify-content:center}
   .echecks{display:grid;grid-template-columns:1fr 1fr;gap:6px}
   .echecks[hidden]{display:none}
   .enote{font-size:12px}
@@ -289,7 +291,7 @@ footer li{margin-bottom:4px}
   #list .tag.tp{display:none} /* トップの一覧だけ。検査ページではその検査の料金が並び順の根拠なので残す */
   .estline{margin-top:6px}
   .estline b{font-size:18px}
-  .frow input[type=search]{flex:1 1 auto;min-width:0}
+  .frow input[type=search]{flex:1 1 100%;min-width:0}
   .ftoggle{display:inline-flex;align-items:center;font:inherit;font-size:13.5px;min-height:40px;padding:7px 12px;
     background:var(--sheet);border:1px solid var(--rule);border-radius:2px;color:var(--ink-2);cursor:pointer;white-space:nowrap}
   .ftoggle span{color:var(--asagi-deep);font-weight:700}

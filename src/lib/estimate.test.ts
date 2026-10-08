@@ -37,11 +37,19 @@ test("parseAmount: 数字なしの文字列は unknown", () => {
 });
 
 const t = (amt: string, subs: [string, string][] = []): Test => ["感染症検査", amt, subs];
-test("testCost: 親が数値なら親の値（サブ項目は見ない）", () => {
-  assert.deepEqual(testCost(t("4000", [["梅毒", "1000"], ["淋病", "3000"]])), { yen: 4000, kind: "num" });
+test("testCost: サブ項目がなければ親の値", () => {
+  assert.deepEqual(testCost(t("4000")), { yen: 4000, kind: "num" });
+  assert.deepEqual(testCost(t("平日 4,000円 土曜 5,000円")), { yen: 4000, kind: "approx" });
 });
-test("testCost: 親が approx でも親の値を使う", () => {
-  assert.deepEqual(testCost(t("平日 4,000円 土曜 5,000円", [["梅毒", "1000"]])), { yen: 4000, kind: "approx" });
+test("testCost: サブ項目があればその合計（親の金額は最初のサブ項目の金額と同じなので足さない）", () => {
+  assert.deepEqual(testCost(t("1000", [["梅毒", "1000"], ["淋病", "3000"]])), { yen: 4000, kind: "num" });
+});
+test("testCost: 実データ: 杉山産婦人科丸の内の女性ホルモン検査は 5 項目の合計", () => {
+  const real: Test = ["女性ホルモン検査", "3300", [["エストロゲン", "3300"], ["プロゲステロン", "2200"], ["ＬＨ", "2200"], ["ＦＳＨ", "2200"], ["プロラクチン", "2200"]]];
+  assert.deepEqual(testCost(real), { yen: 12100, kind: "num" });
+});
+test("testCost: 親が approx でサブ項目に数値があればサブ項目の合計", () => {
+  assert.deepEqual(testCost(t("平日 1,000円 土曜 1,500円", [["梅毒", "平日 1,000円 土曜 1,500円"], ["淋病", "3000"]])), { yen: 4000, kind: "approx" });
 });
 test("testCost: 親が含むでサブ項目に数値があればサブ項目の合計", () => {
   assert.deepEqual(testCost(t("（B型肝炎検査の金額に含む）", [["梅毒", "（B型肝炎検査の金額に含む）"], ["淋病", "3000"], ["クラミジア", "（上記金額に含む）"]])), { yen: 3000, kind: "num" });

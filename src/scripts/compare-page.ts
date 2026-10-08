@@ -47,7 +47,8 @@ export function render(data: Clinic[]) {
   const cs = ids.map((n) => data.find((r) => r.n === n)).filter((r): r is Clinic => !!r);
   const g0 = p.get("g");
   const g: Gender | "" = g0 === "f" || g0 === "m" ? g0 : "";
-  const selected = g ? resolveTests(union(cs.map((r) => (g === "f" ? r.tf : r.tm).map((t) => t[0]))), (p.get("t") || "").split(",")) : [];
+  /* 検査名は全データから引く。比較中の機関がどこも実施していない検査も「未実施」として合計に出すため */
+  const selected = g ? resolveTests(union(data.map((r) => (g === "f" ? r.tf : r.tm).map((t) => t[0]))), (p.get("t") || "").split(",")) : [];
 
   el("cmp-count").textContent = cs.length ? `${cs.length}件` : "";
   el("cmp-empty").hidden = cs.length > 0;

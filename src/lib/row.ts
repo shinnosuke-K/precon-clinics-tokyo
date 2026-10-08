@@ -1,6 +1,6 @@
 /* 一覧1行のHTML。ビルド時（index.astro・区ページ・検査ページ）とブラウザ側（filter.ts）の両方で使うので文字列で組む */
 import { type Clinic, KBLABEL, clinicUrl, esc, hasOnline, hasWeb, streetOf, yen } from "./format";
-import { type Estimate, type Gender, estimate, fmtYen } from "./estimate";
+import { type Estimate, type Gender, type Test, estimate, fmtYen, testCost } from "./estimate";
 
 export interface RowOpts {
   /** 見積もりの性別。空なら検査タグも見積もり行も出さない */
@@ -23,6 +23,14 @@ const priceTag = (v: string) => {
   const [t, c] = yen(v);
   return esc(c === "na" && t.length > 9 ? "詳細を参照" : t);
 };
+/** 検査の費用の表示（サブ項目があればその合計） */
+export const testPriceLabel = (t: Test) => {
+  const a = testCost(t);
+  if (a.kind === "num") return fmtYen(a.yen);
+  if (a.kind === "approx") return fmtYen(a.yen) + "〜";
+  if (a.kind === "included") return "含む";
+  return "詳細を参照";
+};
 
 export function tagsHTML(r: Clinic, g: Gender | "" = "", tests: string[] = []) {
   const tags = [`<span class="tag kb">${KBLABEL[r.kb]}</span>`];
@@ -35,7 +43,7 @@ export function tagsHTML(r: Clinic, g: Gender | "" = "", tests: string[] = []) {
     const src = g === "f" ? r.tf : r.tm;
     for (const name of tests) {
       const t = src.find((x) => x[0] === name);
-      if (t) tags.push(`<span class="tag tp">${esc(name)} ${priceTag(t[1])}</span>`);
+      if (t) tags.push(`<span class="tag tp">${esc(name)} ${esc(testPriceLabel(t))}</span>`);
       else tags.push(`<span class="tag tp na">${esc(name)} 未実施</span>`);
     }
   }

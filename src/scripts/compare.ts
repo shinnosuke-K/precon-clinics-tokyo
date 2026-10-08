@@ -28,6 +28,8 @@ export const pinnedIds = () => mem.map((p) => p.n);
 
 /** 追加できなければ false（上限）。既にあれば外す */
 function toggle(n: number, nm: string): boolean {
+  /* 別タブや bfcache から復元したページが古い選択で上書きしないよう、直前に読み直す */
+  load();
   const i = mem.findIndex((p) => p.n === n);
   if (i >= 0) mem.splice(i, 1);
   else if (mem.length >= MAX) return false;
@@ -92,4 +94,7 @@ el("cbar-clear")?.addEventListener("click", () => {
   sync();
 });
 document.addEventListener("rows:rendered", sync);
+/* 戻る・進むで bfcache から復元されたときと、別タブで変更されたとき */
+window.addEventListener("pageshow", () => { load(); sync(); });
+window.addEventListener("storage", (e) => { if (e.key === KEY) { load(); sync(); } });
 sync();

@@ -1,6 +1,7 @@
 /* 費用の見積もり。純粋関数だけを置き、Node の標準テストランナーで単体テストする。
    format.ts は import.meta.env を使うので値としては import しない（型のみ） */
 import type { Clinic, Test } from "./format";
+export type { Test };
 
 /** 助成上限（円、女性・男性とも）。出典: 東京都福祉局「プレコンセプションケア」
     https://www.fukushi.metro.tokyo.lg.jp/kodomo/shussan/preconceptioncare （2026-10-08 確認） */
@@ -44,14 +45,16 @@ export function parseAmount(s: string | null | undefined): Amount {
   return { yen: Number(nums[0].replace(/,/g, "")), kind: nums.length === 1 ? "num" : "approx" };
 }
 
-/** 検査1項目の費用。親の金額が数値ならそれ、親が「含む」や空でサブ項目に数値があればサブ項目の合計 */
+/** 検査1項目の費用。
+    サブ項目があればその合計（「含む」は0円）。届出シートでは検査名の行が最初のサブ項目の行と同じで、
+    「検査の金額」として読んだ値は最初のサブ項目の金額にすぎないので、親の金額は足さない。
+    サブ項目がなければ親の金額 */
 export function testCost(t: Test): Amount {
   const [, amt, subs] = t;
   const a = parseAmount(amt);
-  if (a.kind === "num" || a.kind === "approx") return a;
-  if (subs.length === 0) return { yen: 0, kind: a.kind };
+  if (subs.length === 0) return a;
   const parsed = subs.map(([, sa]) => parseAmount(sa));
-  if (parsed.every((p) => p.kind === "included")) return { yen: 0, kind: a.kind };
+  if (parsed.every((p) => p.kind === "included")) return { yen: 0, kind: a.kind === "num" ? "included" : a.kind };
   const yen = parsed.reduce((sum, p) => sum + p.yen, 0);
   const kind: Kind = parsed.some((p) => p.kind === "approx" || p.kind === "unknown") ? "approx" : "num";
   return { yen, kind };
