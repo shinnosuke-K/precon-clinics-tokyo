@@ -6,7 +6,7 @@ export default defineConfig({
   site: "https://shinnosuke-k.github.io",
   base: "/precon-clinics-tokyo",
   trailingSlash: "always",
-  integrations: [sitemap()],
+  integrations: [sitemap({ filter: (page) => !page.endsWith("/compare/") })],
   build: {
     // ページを c/1.html ではなく c/1/index.html に出す（URLは /c/1/）
     format: "directory",

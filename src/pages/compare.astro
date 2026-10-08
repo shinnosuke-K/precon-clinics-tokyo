@@ -1,0 +1,31 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { baseTitle } from "../lib/clinics";
+import { url } from "../lib/format";
+
+const description = "一覧で選んだ医療機関（最大3件）の料金・検査メニュー・見積もりを横並びで比較します。個人が作成した非公式ページです。";
+---
+
+<Layout title={`医療機関の比較｜${baseTitle}`} description={description} path="compare/">
+  <Fragment slot="head">
+    <meta name="robots" content="noindex" />
+  </Fragment>
+
+  <main>
+    <div class="wrap">
+      <a class="backlink" href={url("")}>← 一覧に戻る</a>
+      <h2 class="ph">医療機関の比較<span class="cnt" id="cmp-count"></span></h2>
+      <p class="pdesc" id="cmp-desc"></p>
+      <div class="cmpwrap" id="cmp" hidden></div>
+      <div class="empty" id="cmp-empty" hidden><b>比較する医療機関がありません</b>一覧の各行にある「比較」を押して選んでください（最大3件）。<a href={url("")}>一覧へ戻る</a></div>
+      <p class="asof">金額は各機関の届出時点のものです。受診前に医療機関にご確認ください。このページのURLはそのまま共有できます。</p>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  import data from "../data/clinics.json";
+  import type { Clinic } from "../lib/format";
+  import { render } from "../scripts/compare-page";
+  render(data.records as Clinic[]);
+</script>
