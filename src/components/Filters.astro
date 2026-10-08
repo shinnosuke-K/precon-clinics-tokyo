@@ -1,12 +1,18 @@
 ---
 import { ku, shi, testCount } from "../lib/clinics";
+
+const sides = [
+  ["f", "女性", testCount.f],
+  ["m", "男性", testCount.m],
+] as const;
 ---
 
 <div class="filters">
   <div class="wrap">
     <div class="frow">
       <input type="search" id="q" placeholder="医療機関名・住所・電話で検索（例：新宿、ART）" aria-label="医療機関名・住所・電話番号で検索" />
-      <button class="ftoggle" id="ftoggle" aria-expanded="false" aria-controls="fmore">絞り込み<span id="fcount"></span></button>
+      <button class="ftoggle" id="ftoggle" type="button" aria-expanded="false" aria-controls="fmore">絞り込み<span id="fcount"></span></button>
+      <button class="etoggle" id="etoggle" type="button" aria-expanded="false" aria-controls="epanel">費用を見積もる<span id="esum"></span></button>
       <div class="fmore" id="fmore">
         <select id="area" aria-label="区市町村で絞り込み">
           <option value="">すべての区市町村</option>
@@ -17,33 +23,48 @@ import { ku, shi, testCount } from "../lib/clinics";
             {shi.map(([w, c]) => <option value={w}>{w}（{c}）</option>)}
           </optgroup>
         </select>
-        <select id="test" aria-label="検査メニューで絞り込み">
-          <option value="">すべての検査メニュー</option>
-          <optgroup label="女性検査">
-            {[...testCount.f].map(([n, c]) => <option value={`f:${n}`}>{n}（{c}）</option>)}
-          </optgroup>
-          <optgroup label="男性検査">
-            {[...testCount.m].map(([n, c]) => <option value={`m:${n}`}>{n}（{c}）</option>)}
-          </optgroup>
-        </select>
-        <button class="chip k-f" id="c-f" aria-pressed="false">女性が受診できる</button>
-        <button class="chip k-m" id="c-m" aria-pressed="false">男性が受診できる</button>
-        <button class="chip" id="c-online" aria-pressed="false">オンライン相談可</button>
-        <button class="chip" id="c-web" aria-pressed="false">web予約可</button>
-        <button class="chip" id="c-sp" aria-pressed="false">女性ヘルスケア専門医</button>
-        <button class="chip" id="c-open" aria-pressed="false">受付中のみ</button>
+        <button class="chip k-f" id="c-f" type="button" aria-pressed="false">女性が受診できる</button>
+        <button class="chip k-m" id="c-m" type="button" aria-pressed="false">男性が受診できる</button>
+        <button class="chip" id="c-online" type="button" aria-pressed="false">オンライン相談可</button>
+        <button class="chip" id="c-web" type="button" aria-pressed="false">web予約可</button>
+        <button class="chip" id="c-sp" type="button" aria-pressed="false">女性ヘルスケア専門医</button>
+        <button class="chip" id="c-open" type="button" aria-pressed="false">受付中のみ</button>
         <select id="sort" aria-label="並び順">
           <option value="no">登録順</option>
           <option value="fee">初診料が安い順</option>
-          <option value="tfee" id="o-tfee" hidden disabled>選択した検査が安い順</option>
+          <option value="total" id="o-total" hidden disabled>合計が安い順</option>
           <option value="name">五十音・アルファベット順</option>
           <option value="new">登録が新しい順</option>
         </select>
       </div>
+      <div class="epanel" id="epanel" hidden>
+        <div class="erow">
+          <span class="elbl" id="elbl-g">性別</span>
+          <span class="seg" role="radiogroup" aria-labelledby="elbl-g">
+            <label><input type="radio" name="g" value="f" />女性</label>
+            <label class="m"><input type="radio" name="g" value="m" />男性</label>
+          </span>
+        </div>
+        <div class="erow">
+          <span class="elbl">受けたい検査</span>
+          {sides.map(([g, _, counts]) => (
+            <span class="echecks" id={`echecks-${g}`} hidden>
+              {[...counts].map(([n, c]) => (
+                <label><input type="checkbox" name={`t-${g}`} value={n} />{n}<span class="n">{c}</span></label>
+              ))}
+            </span>
+          ))}
+          <span class="ehint" id="ehint">性別を選ぶと検査を選べます</span>
+        </div>
+        <p class="enote">
+          合計は初診料＋必須検査（尿・血液・麻疹抗体）＋助言・相談料＋選んだ検査。再診料は含みません。自己負担は助成上限3万円（<a href="https://www.fukushi.metro.tokyo.lg.jp/kodomo/shussan/preconceptioncare" target="_blank" rel="noopener">東京都福祉局</a>）を差し引いた目安です。金額は届出時点のもので、受診前に医療機関にご確認ください。
+          <button class="linkbtn" id="eclear" type="button">見積もりを解除</button>
+        </p>
+      </div>
     </div>
     <div class="status">
       <span><b id="count">0</b> 件を表示中<span id="filterdesc"></span></span>
-      <button class="linkbtn" id="reset" hidden>絞り込みを解除</button>
+      <button class="linkbtn" id="reset" type="button" hidden>絞り込みを解除</button>
     </div>
   </div>
 </div>
