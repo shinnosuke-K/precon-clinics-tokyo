@@ -51,6 +51,12 @@ export const norm = (s: string) =>
     .toLowerCase()
     .replace(/[ァ-ヶ]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60));
 
+/** "2026-10-24" のようなISO日付を「令和8年10月24日」に変換する */
+export const toReiwa = (iso: string): string => {
+  const [y, m, d] = iso.split("-").map(Number);
+  return `令和${y - 2018}年${m}月${d}日`;
+};
+
 export const hasOnline = (r: Clinic) => r.cs.includes("オンライン");
 export const hasWeb = (r: Clinic) => r.rv.some((x) => x.startsWith("web"));
 export const streetOf = (r: Clinic) => r.ad.replace(/^東京都/, "");

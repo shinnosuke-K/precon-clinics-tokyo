@@ -1,8 +1,12 @@
 import data from "../data/clinics.json";
-import type { Clinic } from "./format";
+import lastCheckedData from "../data/lastChecked.json";
+import { toReiwa, type Clinic } from "./format";
 
 export const asof: string = data.asof;
 export const records = data.records as Clinic[];
+
+/** 東京都の公開ページでリストの更新有無を最後に確認した日（令和表記） */
+export const lastChecked: string = toReiwa(lastCheckedData.date);
 
 export const baseTitle = `プレコンセプションケア 検査費等助成 登録医療機関（${asof}）｜非公式`;
 export const siteDescription = `東京都のプレコンセプションケア検査費等助成に登録している医療機関の一覧（${asof}）。エリア・受診対象・予約方法から検索できます。個人が作成した非公式サイトであり、東京都が運営するものではありません。`;

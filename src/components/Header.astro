@@ -1,5 +1,5 @@
 ---
-import { asof, records, wardsSorted } from "../lib/clinics";
+import { asof, lastChecked, records, wardsSorted } from "../lib/clinics";
 
 const both = records.filter((r) => r.kb === "both").length;
 const sp = records.filter((r) => r.sp).length;
@@ -15,6 +15,7 @@ const sp = records.filter((r) => r.sp).length;
       出典：東京都福祉局「<a href="https://www.fukushi.metro.tokyo.lg.jp/kodomo/shussan/preconceptioncare" target="_blank" rel="noopener">プレコンセプションケア</a>」ページ公開の登録医療機関リスト<br />
       <span class="unofficial">本サイトは個人が作成した非公式のページです（東京都の運営ではありません）</span>
     </p>
+    <p class="src" id="last-checked">最終確認日：{lastChecked}（東京都の公開ページでリストの更新有無を確認した日）</p>
     <div class="facts">
       <span class="fact"><b>{records.length}</b>機関</span>
       <span class="fact"><b>{wardsSorted.length}</b>区市町村</span>
