@@ -29,6 +29,7 @@
 | `data/*.xlsx` | 元データ（登録医療機関一覧）。名前順で最後のファイルが使われます |
 | `scripts/build.py` | Excelから `src/data/clinics.json` を生成するスクリプト |
 | `src/data/clinics.json` | ページが読み込むデータ（生成物。コミットしておくとローカル開発時にPythonが不要） |
+| `src/data/lastChecked.json` | 東京都の公開ページでリストの更新有無を最後に確認した日（`{"date": "YYYY-MM-DD"}`）。ヘッダーの「最終確認日」に表示 |
 | `src/pages/index.astro` | 一覧ページ |
 | `src/pages/c/[n].astro` | 医療機関ごとの詳細ページ（183ページを静的生成） |
 | `src/pages/area/[ward].astro` | 区市町村ごとの一覧ページ |
