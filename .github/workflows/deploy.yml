@@ -5,12 +5,8 @@ on:
     branches: [main]
   workflow_dispatch:
 
-permissions:
-  contents: read
-  # deploy-pages がアップロード済みアーティファクトを Actions API で探すのに必要
-  actions: read
-  pages: write
-  id-token: write
+# 権限はジョブ単位で最小限に付与する
+permissions: {}
 
 concurrency:
   group: pages
@@ -18,12 +14,22 @@ concurrency:
 
 jobs:
   build-deploy:
+    name: Build and deploy
+    timeout-minutes: 15
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read # リポジトリを checkout するために必要
+      actions: read # deploy-pages がアップロード済みアーティファクトを Actions API で探すのに必要
+      pages: write # deploy-pages が GitHub Pages にデプロイするために必要
+      id-token: write # deploy-pages が OIDC トークンでデプロイ元を検証するために必要
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # 後続ステップで git push しないので認証情報は残さない
+          persist-credentials: false
 
       - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
