@@ -24,10 +24,20 @@ jobs:
     permissions:
       contents: read # ワークフローファイルを checkout するために必要
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
-      - uses: koki-develop/github-actions-lint/actionlint@5ecd42b59803f14bfaa7ed0bfb8de8c1dc1b4c6d # v1.6.0
+      - name: Install actionlint
+        working-directory: ${{ runner.temp }}
+        env:
+          ACTIONLINT_VERSION: 1.7.12
+          ACTIONLINT_SHA256: 8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8
+        run: |
+          curl -fsSL -o actionlint.tar.gz "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+          echo "${ACTIONLINT_SHA256}  actionlint.tar.gz" | sha256sum -c -
+          tar -xzf actionlint.tar.gz actionlint
+          sudo install -m 755 actionlint /usr/local/bin/actionlint
+      - run: actionlint -color -verbose
 
   ghalint:
     name: ghalint
@@ -36,10 +46,22 @@ jobs:
     permissions:
       contents: read # ワークフローファイルを checkout するために必要
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
-      - uses: koki-develop/github-actions-lint/ghalint@5ecd42b59803f14bfaa7ed0bfb8de8c1dc1b4c6d # v1.6.0
+      - name: Install ghalint
+        working-directory: ${{ runner.temp }}
+        env:
+          GHALINT_VERSION: 1.6.0
+          GHALINT_SHA256: eda1af79c1a4a31c2de5831cd1333ad582fa6fa72015f8e9c1c4525d550c1d35
+        run: |
+          curl -fsSL -o ghalint.tar.gz "https://github.com/suzuki-shunsuke/ghalint/releases/download/v${GHALINT_VERSION}/ghalint_${GHALINT_VERSION}_linux_amd64.tar.gz"
+          echo "${GHALINT_SHA256}  ghalint.tar.gz" | sha256sum -c -
+          tar -xzf ghalint.tar.gz ghalint
+          sudo install -m 755 ghalint /usr/local/bin/ghalint
+      - run: ghalint run
+        env:
+          GHALINT_LOG_COLOR: always
 
   zizmor:
     name: zizmor
@@ -48,11 +70,34 @@ jobs:
     permissions:
       contents: read # ワークフローファイルを checkout するために必要
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
-      - uses: koki-develop/github-actions-lint/zizmor@5ecd42b59803f14bfaa7ed0bfb8de8c1dc1b4c6d # v1.6.0
+      - uses: zizmorcore/zizmor-action@v0.8.1
         with:
-          # オンラインモードで GitHub API を使う監査も有効にする
-          github-token: ${{ github.token }}
+          # lockfile（actions.lock）を認識できる 1.32.0 以降を使う
+          version: 1.32.0
           persona: auditor
+          # Advanced Security（SARIF アップロード）は使わず、指摘があればジョブを失敗させる
+          advanced-security: false
+          annotations: true
+
+  actions-lock:
+    name: gh actions-lock --verify
+    timeout-minutes: 5
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read # ワークフローファイルと actions.lock を checkout するために必要
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install gh-actions-lock
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_ACTIONS_LOCK_VERSION: v0.4.1
+        run: gh extension install github/gh-actions-lock --pin "${GH_ACTIONS_LOCK_VERSION}"
+      # actions.lock がワークフローの uses: と一致し、各 pin が上流で検証できることを確認する
+      - run: gh actions-lock --verify
+        env:
+          GH_TOKEN: ${{ github.token }}
