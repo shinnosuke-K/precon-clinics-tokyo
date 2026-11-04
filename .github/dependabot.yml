@@ -1,0 +1,19 @@
+# アクションのバージョン更新を Dependabot に任せる。
+# lockfile（.github/workflows/actions.lock）を導入済みのワークフローでは、
+# 同じ PR で actions.lock の該当エントリも再生成される。
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: Asia/Tokyo
+    # 公開直後のリリースをすぐ取り込まず、しばらく寝かせてから更新する
+    cooldown:
+      default-days: 7
+    # 毎週の PR をまとめてレビューしやすくする
+    groups:
+      github-actions:
+        patterns: ["*"]
