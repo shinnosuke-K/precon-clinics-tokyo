@@ -11,7 +11,8 @@
 
 - 医療機関名・住所・電話番号のキーワード検索（全角・半角、カタカナ・ひらがなの表記ゆれを吸収）
 - 地域（区市町村）での絞り込み
-- 検査メニュー（AMH検査・精液検査など）での絞り込みと、選択した検査の料金順ソート
+- 費用の見積もり（性別と受けたい検査を選ぶと、各機関の「初診料＋必須検査＋助言・相談料＋選んだ検査」の合計と、助成上限3万円を差し引いた自己負担の目安を表示。合計の安い順に並べ替え可）
+- 医療機関の比較（最大3件をピン留めし、`/compare/` で料金・検査メニュー・見積もりを横並びに表示。URLで共有可）
 - 条件チップでの絞り込み（女性可 / 男性可 / オンライン相談 / web予約 / 専門医在籍 / 受付中のみ）
 - 絞り込み条件はURLのクエリに保存され、そのままのURLで共有・再表示できる
 - 各医療機関の詳細ページ（`/c/{登録番号}/`。受診方法、費用、必須検査・任意検査の項目と金額）
@@ -35,6 +36,10 @@
 | `src/pages/area/[ward].astro` | 区市町村ごとの一覧ページ |
 | `src/pages/test/[side]/[slug].astro` | 検査メニューごとの一覧ページ（料金順） |
 | `src/lib/pages.ts` | 区市町村・検査メニューページの定義とURL |
+| `src/lib/estimate.ts` | 費用の見積もりの計算（純粋関数。`estimate.test.ts` で単体テスト） |
+| `src/lib/query.ts` | URLクエリの読み替えとスラッグ（`query.test.ts` で単体テスト） |
+| `src/scripts/compare.ts` | 比較のピン留め（localStorage）と画面下のバー |
+| `src/pages/compare.astro`, `src/scripts/compare-page.ts` | 比較ページ |
 | `src/scripts/filter.ts` | 一覧の検索・絞り込み・並び替え（ブラウザ側） |
 | `src/lib/` | データの集計、料金表示などの共通処理 |
 | `src/components/`, `src/layouts/` | ヘッダー・フィルタ・詳細表示などの部品 |
@@ -67,6 +72,10 @@ uv run scripts/build.py    # data/ の Excel から src/data/clinics.json を再
 
 ```bash
 npm install && npm run dev    # http://localhost:4321/precon-clinics-tokyo/
+```
+
+```bash
+npm test    # src/lib の単体テスト（Node 22 の標準テストランナー。追加の依存なし）
 ```
 
 ```bash

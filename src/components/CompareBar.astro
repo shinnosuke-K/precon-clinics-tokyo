@@ -1,0 +1,17 @@
+---
+/* 画面下の比較バー。ピン留めが1件以上あるときだけ compare.ts が表示する */
+import { url } from "../lib/format";
+---
+
+<div class="cbar" id="cbar" hidden>
+  <div class="wrap">
+    <span class="cnames" id="cbar-names"></span>
+    <a class="cbtn" id="cbar-go" href={url("compare/")}>比較する（<span id="cbar-count">0</span>件）</a>
+    <button class="linkbtn" id="cbar-clear" type="button">すべて外す</button>
+    <span class="cmsg" id="cbar-msg" role="status" aria-live="polite"></span>
+  </div>
+</div>
+
+<script>
+  import "../scripts/compare";
+</script>
